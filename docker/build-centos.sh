@@ -92,8 +92,8 @@ yum -y install \
 echo "Builder: installing mongo cxx driver"
 git clone https://github.com/FIWARE-Ops/mongo-cxx-driver ${ROOT}/mongo-cxx-driver
 cd ${ROOT}/mongo-cxx-driver
-scons --disable-warnings-as-errors --use-sasl-client --ssl
-scons install --disable-warnings-as-errors --prefix=/usr/local --use-sasl-client --ssl
+scons --disable-warnings-as-errors --use-sasl-client --ssl --c++11
+scons install --disable-warnings-as-errors --prefix=/usr/local --use-sasl-client --ssl --c++11
 cd ${ROOT} && rm -Rf mongo-cxx-driver
 
 echo "Builder: installing rapidjson"
