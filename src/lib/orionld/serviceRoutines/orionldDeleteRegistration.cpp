@@ -22,6 +22,7 @@
 *
 * Author: Ken Zangelin
 */
+#include "string.h"
 #include "logMsg/logMsg.h"                                        // LM_*
 #include "logMsg/traceLevels.h"                                   // Lmt*
 
@@ -29,7 +30,9 @@
 #include "orionld/common/orionldState.h"                          // orionldState
 #include "orionld/common/orionldErrorResponse.h"                  // orionldErrorResponseCreate
 #include "orionld/serviceRoutines/orionldDeleteRegistration.h"    // Own Interface
-
+#include "mongoBackend/mongoRegistrationDelete.h"                 // mongoRegistrationDelete
+#include "orionld/common/urlCheck.h"                              // urlCheck
+#include "orionld/common/urnCheck.h"                              // urlCheck
 
 
 // ----------------------------------------------------------------------------
@@ -38,11 +41,34 @@
 //
 bool orionldDeleteRegistration(ConnectionInfo* ciP)
 {
+   OrionError                       oError;
+   char*                            details;
+   const std::string                regId(orionldState.wildcard[0]);
+  
   LM_T(LmtServiceRoutine, ("In orionldDeleteRegistration"));
 
-  orionldErrorResponseCreate(OrionldBadRequestData, "Not implemented - DELETE /ngsi-ld/v1/csourceRegistrations/*", orionldState.wildcard[0], OrionldDetailsString);
+  if ((urlCheck(orionldState.wildcard[0], &details) == false) && (urnCheck(orionldState.wildcard[0], &details) == false))
+  {
+    orionldErrorResponseCreate(OrionldBadRequestData, "Invalid Registration ID", details, OrionldDetailsString);
+    ciP->httpStatusCode = SccBadRequest;
+    return false;
+  }
+  
+  LM_T(LmtServiceRoutine, ("jorge-log: valor do id %s", regId.c_str()));
 
-  ciP->httpStatusCode = SccNotImplemented;
+  mongoRegistrationDelete(regId, orionldState.tenant, ciP->servicePathV[0], &oError);
+
+ 
+  if(oError.code != 0)
+  {
+    orionldErrorResponseCreate(OrionldBadRequestData, oError.reasonPhrase.c_str(), oError.details.c_str(), OrionldDetailsString);
+    ciP->httpStatusCode = oError.code;
+  }else
+  {
+    ciP->httpStatusCode = SccNoContent;
+  }
+  
+  
 
   return true;
 }

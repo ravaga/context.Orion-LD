@@ -41,6 +41,7 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/mongoRegistrationDelete.h"
+#include "orionld/common/orionldState.h"
 
 
 
@@ -61,7 +62,8 @@ void mongoRegistrationDelete
   mongo::OID   oid;
   StatusCode   sc;
 
-  if (safeGetRegId(regId, &oid, &sc) == false)
+  
+  if (orionldState.apiVersion != NGSI_LD_V1 && safeGetRegId(regId, &oid, &sc) == false)
   {
     oeP->fill(sc);
     return;
@@ -74,7 +76,15 @@ void mongoRegistrationDelete
   std::auto_ptr<mongo::DBClientCursor>  cursor;
   mongo::BSONObj                        q;
 
-  q = BSON("_id" << oid);
+  if (orionldState.apiVersion == NGSI_LD_V1)
+  {
+    q = BSON("_id" << regId);
+  }else
+  {
+    q = BSON("_id" << oid);
+  }
+
+   LM_T(LmtServiceRoutine, ("jorge-log: query %s", q.toString()));
 
   TIME_STAT_MONGO_READ_WAIT_START();
   mongo::DBClientBase* connection = getMongoConnection();
