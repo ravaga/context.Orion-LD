@@ -46,8 +46,9 @@ extern "C"
 #include "mongoBackend/dbConstants.h"
 
 #ifdef ORIONLD
-#include "orionld/common/orionldState.h"                // orionldState
-#include "orionld/context/orionldContextItemExpand.h"   // orionldContextItemExpand
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/eqForDot.h"                             // eqForDot
+#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #endif
 #include "rest/StringFilter.h"
 
@@ -462,9 +463,9 @@ bool StringFilterItem::valueGet
 
   if ((*valueTypeP == SfvtString) && (op != SfopMatchPattern))
   {
-    if (forbiddenChars(s, ""))
+    if (forbiddenChars(s, "="))  // For NGSI-LD, attr long names have had the dots replaced by '='
     {
-      LM_E(("forbidden characters in String Filter"));
+      LM_E(("forbidden characters in String Filter '%s'", s));
       *errorStringP = std::string("forbidden characters in String Filter");
       return false;
     }
@@ -522,7 +523,14 @@ static StringFilterOp opFind(char* expression, char** lhsP, char** rhsP)
       }
       else   if (*eP == '<') { *rhsP = &eP[1]; op = SfopLessThan;           }
       else   if (*eP == '>') { *rhsP = &eP[1]; op = SfopGreaterThan;        }
-      else   if (*eP == ':') { *rhsP = &eP[1]; op = SfopEquals;             }
+      else   if (*eP == ':')
+      {
+        if (orionldState.apiVersion != NGSI_LD_V1)
+        {
+          *rhsP = &eP[1];
+          op = SfopEquals;
+        }
+      }
 
       if (op != SfopExists)  // operator found, RHS already set
       {
@@ -617,6 +625,9 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
     return false;
   }
 
+  // Replace '=' back to '.'
+  eqForDot(lhs);
+
   if (forbiddenChars(lhs, "'"))
   {
     if (type == SftQ)
@@ -657,7 +668,7 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
     expanded = kaStrdup(&orionldState.kalloc, expanded);
 
     char* cP = expanded;
-    LM_TMP(("EQDOT: %s->%s", attributeName.c_str(), expanded));
+
     while (*cP != 0)
     {
       if (*cP == '.')
@@ -666,7 +677,6 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
     }
 
     attributeName = expanded;
-    LM_TMP(("EQDOT: attributeName: '%s'", attributeName.c_str()));
   }
 
 #endif

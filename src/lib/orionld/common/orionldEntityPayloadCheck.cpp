@@ -72,26 +72,25 @@ bool orionldValidName(char* name, char** detailsPP)
   for (; *name != 0; ++name)
   {
     //
-    // Valid chars:
-    //   o a-z: 97-122
-    //   o A-Z: 65-90
-    //   o 0-9: 48-57
-    //   o '_': 95
+    // Invalid chars:
+    //   '=',
+    //   '[',
+    //   ']',
+    //   '&',
+    //   '?',
+    //   '"',
+    //   ''',
+    //   '\b',
+    //   '\t',
+    //   '\n', and
+    //   '#'
     //
-
-    if ((*name >= 'a') && (*name <= 'z'))
-      continue;
-    if ((*name >= 'A') && (*name <= 'Z'))
-      continue;
-    if ((*name >= '0') && (*name <= '9'))
-      continue;
-    if (*name == '_')
-      continue;
-    if (*name == ':')
-      continue;
-
-    *detailsPP = (char*) "invalid character in name";
-    return false;
+    if ((*name == '=') || (*name == '[') || (*name == ']') || (*name == '&') || (*name == '?') || (*name == '"') ||
+        (*name == '\'') || (*name == '\b') || (*name == '\t') || (*name == '\n') || (*name == '#'))
+    {
+      *detailsPP = (char*) "invalid character in name";
+      return false;
+    }
   }
 
   return true;
@@ -192,7 +191,6 @@ bool orionldEntityPayloadCheck
         //   ciP->httpStatusCode = SccConflict;
         //   return false;
         // }
-        LM_TMP(("ID: %s", orionldState.payloadIdNode->value.s));
       }
       else if (strcmp(kNodeP->name, "type") == 0)
       {
@@ -233,11 +231,6 @@ bool orionldEntityPayloadCheck
     }
     else  // Property/Relationshiop - must check chars in the name of the attribute
     {
-      if (kNodeP->type == KjString)
-        LM_TMP(("Name: %s | Value: %s", kNodeP->name, kNodeP->value.s));
-      else
-        LM_TMP(("Name: %s | Type: %s", kNodeP->name, kjValueType(kNodeP->type)));
-
       if (strcmp(kNodeP->name, "@context") != 0)
       {
         if (orionldValidName(kNodeP->name, &detailsP) == false)
@@ -250,14 +243,8 @@ bool orionldEntityPayloadCheck
     kNodeP = kNodeP->next;
   }
 
-  if (isBatchOperation)
-  {
-    LM_TMP(("isBatchOperation TRUE"));
-    if (checkEntityIdFieldExists() == false)
-    {
-      return false;
-    }
-  }
+  if ((isBatchOperation == true) && (checkEntityIdFieldExists() == false))
+    return false;
 
 
   //

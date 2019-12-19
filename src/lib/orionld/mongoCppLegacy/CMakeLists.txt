@@ -27,8 +27,8 @@ SET (SOURCES
     mongoCppLegacyEntityBatchDelete.cpp
     mongoCppLegacyKjTreeFromBsonObj.cpp
     mongoCppLegacyKjTreeToBsonObj.cpp
-    mongoCppLegacyEntityOperationsUpsert.cpp
     mongoCppLegacySubscriptionMatchEntityIdAndAttributes.cpp
+    mongoCppLegacyEntityListLookupWithIdTypeCreDate.cpp
 )
 
 # Include directories

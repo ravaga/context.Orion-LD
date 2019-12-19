@@ -23,12 +23,39 @@ sudo yum install make cmake gcc-c++ scons
 Libraries that aren't built from source code:
 
 ```bash
-sudo yum install boost-devel libcurl-devel gnutls-devel libgcrypt-devel openssl-devel libuuid-devel cyrus-sasl-devel
+sudo yum install boost-devel libcurl-devel gnutls-devel libgcrypt-devel openssl-devel libuuid-devel cyrus-sasl-devel libicu libicu-devel
 ```
 
 ## Download and build dependency libraries from source code
 Some libraries are built from source code and those sources must be downloaded and compiled.
+# Orion-LD Installation Guide for Debian 10
 
+To be written (copy the context of the installation guide for Ubuntu 18.04.3 and modify for Debian 10)
+
+Commands used on Ubuntu 18.04.3 installation
+
+```bash
+sudo aptitude install libssl1.0-dev gnutls-dev libcurl4-gnutls-dev libsasl2-dev \
+                      libgcrypt-dev uuid-dev libboost-dev libboost-regex-dev libboost-thread-dev \
+                      libboost-filesystem-dev
+```
+Commands used on Debian 10 installation
+
+```bash
+sudo apt-get install aptitude
+sudo aptitude install build-essential cmake scons curl
+
+sudo aptitude install libssl-dev
+		              gnutls-dev 
+                      libcurl4-gnutls-dev 
+                      libsasl2-dev 
+                      libgcrypt-dev 
+		              uuid-dev 
+		              libboost-dev 
+                      libboost-regex-dev  
+                      libboost-thread-dev 
+                      libboost-filesystem-dev
+```
 * Mongo Driver:   legacy-1.1.2
 * libmicrohttpd:  0.9.48
 * rapidjson:      1.0.2
@@ -194,18 +221,6 @@ cd ~/git
 git clone https://github.com/FIWARE/context.Orion-LD.git
 cd context.Orion-LD
 make install
-```
-
-If you got that error:
-
-```bash
-/bin/ld: cannot find -licuuc
-/bin/ld: cannot find -licudata
-```
-
-Run this command bellow:
-```bash
-yum install libicu yum install libicu-devel
 ```
 
 At the end of `make install`, the makefile wants to copy the executable (orionld) to /usr/bin, and more files under /usr.

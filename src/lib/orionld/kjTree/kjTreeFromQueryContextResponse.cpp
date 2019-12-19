@@ -59,17 +59,12 @@ extern "C"
 //
 static bool inAttrList(const char* attrName, char** attrListExpanded, int attrsInAttrList)
 {
-  LM_TMP(("ATTRS: Checking attribute '%s'", attrName));
   for (int ix = 0; ix < attrsInAttrList; ix++)
   {
     if (strcmp(attrName, attrListExpanded[ix]) == 0)
-    {
-      LM_TMP(("ATTRS: '%s' is in the attrs list, so, must be included in the response", attrName));
       return true;
-    }
   }
 
-  LM_TMP(("ATTRS: '%s' is NOT in the attrs list, so, must NOT be included in the response", attrName));
   return false;
 }
 
@@ -83,8 +78,6 @@ static void attrListParseAndExpand(int* attrsInAttrListP, char*** attrListExpand
 {
   int   attrs = 0;
   char* cP;
-
-  LM_TMP(("ATTRS: incoming attrList: %s", attrList));
 
   //
   // attrList is a comma-separated list.
@@ -146,15 +139,11 @@ static void attrListParseAndExpand(int* attrsInAttrListP, char*** attrListExpand
   //
   for (int ix = 0; ix < attrs; ix++)
   {
-    LM_TMP(("BUG: Calling orionldContextItemExpand for '%s'", expandedV[ix]));
     expandedV[ix] = orionldContextItemExpand(orionldState.contextP, expandedV[ix], NULL, true, NULL);
-    LM_TMP(("BUG: orionldContextItemExpand returned '%s'", expandedV[ix]));
   }
 
   *attrListExpandedVecP = expandedV;
   *attrsInAttrListP     = attrs;
-
-  LM_TMP(("ATTRS: Expanded Array created (%d items)", attrs));
 }
 
 
@@ -357,9 +346,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, char* a
       char*             valueFieldName;
       bool              valueMayBeCompacted  = false;
 
-      LM_TMP(("BUG: Treating attribute '%s'", attrShortName));
       attrName = orionldContextItemAliasLookup(orionldState.contextP, attrShortName, &valueMayBeCompacted, NULL);
-      LM_TMP(("BUG: Got alias '%s' for '%s' via context '%s'", orionldState.contextP->url, attrShortName, attrName));
 
       //
       // If URI param attrList has been used, only matching attributes should be included in the response
@@ -367,10 +354,8 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, char* a
       if ((attrListExpanded != NULL) && (inAttrList(attrShortName, attrListExpanded, attrsInAttrList) == false))
         continue;
 
-      LM_TMP(("VAL: Value of %s may be compacted? - %s", attrShortName, FT(valueMayBeCompacted)));
       if (keyValues)
       {
-        LM_TMP(("VAL: keyValues"));
         // If keyValues, then just the value of the attribute is to be rendered (built)
         switch (aP->valueType)
         {
@@ -424,7 +409,6 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, char* a
         //
         // NOT keyValues - create entire attribute tree
         //
-        LM_TMP(("BUG: Not keyValues. attribute: '%s'", attrName));
         aTop = kjObject(orionldState.kjsonP, attrName);
         if (aTop == NULL)
         {
@@ -449,7 +433,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, char* a
 
         // value
         valueFieldName = (char*) ((aP->type == "Relationship")? "object" : "value");
-        LM_TMP(("VAL: value type: %s", valueTypeName(aP->valueType)));
+
         switch (aP->valueType)
         {
         case orion::ValueTypeNumber:
@@ -472,29 +456,17 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, char* a
           break;
 
         case orion::ValueTypeString:
-          LM_TMP(("VAL: It's a string ..."));
-
           if (valueMayBeCompacted == true)
           {
-            LM_TMP(("VAL: ... and it may be compacted"));
             char* compactedValue = orionldContextItemAliasLookup(orionldState.contextP, aP->stringValue.c_str(), NULL, NULL);
 
             if (compactedValue != NULL)
-            {
-              LM_TMP(("VAL: compacted value is: %s", compactedValue));
               nodeP = kjString(orionldState.kjsonP, valueFieldName, compactedValue);
-            }
             else
-            {
-              LM_TMP(("VAL: compacted value - not found"));
               nodeP = kjString(orionldState.kjsonP, valueFieldName, aP->stringValue.c_str());
-            }
           }
           else
-          {
-            LM_TMP(("VAL: ... and it may NOT be compacted"));
             nodeP = kjString(orionldState.kjsonP, valueFieldName, aP->stringValue.c_str());
-          }
           break;
 
         case orion::ValueTypeBoolean:   nodeP = kjBoolean(orionldState.kjsonP, valueFieldName, (KBool) aP->boolValue);       break;
@@ -502,9 +474,7 @@ KjNode* kjTreeFromQueryContextResponse(ConnectionInfo* ciP, bool oneHit, char* a
         case orion::ValueTypeNotGiven:  nodeP = kjString(orionldState.kjsonP, valueFieldName, "UNKNOWN TYPE");               break;
 
         case orion::ValueTypeVector:
-          LM_TMP(("VAL: Compound value, of Array type"));
         case orion::ValueTypeObject:
-          LM_TMP(("VAL: Compound value"));
           nodeP = (aP->compoundValueP->valueType == orion::ValueTypeVector)? kjArray(orionldState.kjsonP, valueFieldName) : kjObject(orionldState.kjsonP, valueFieldName);
           if (nodeP == NULL)
           {

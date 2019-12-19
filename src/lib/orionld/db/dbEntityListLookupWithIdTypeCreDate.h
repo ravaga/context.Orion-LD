@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_DB_DBENTITYBATCHDELETE_H_
-#define SRC_LIB_ORIONLD_DB_DBENTITYBATCHDELETE_H_
+#ifndef SRC_LIB_ORIONLD_DB_DBENTITYLISTLOOKUPWITHIDTYPECREDATE_H
+#define SRC_LIB_ORIONLD_DB_DBENTITYLISTLOOKUPWITHIDTYPECREDATE_H
 
 /*
 *
@@ -30,14 +30,14 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "orionld/db/dbConfiguration.h"                          // DbEntityBatchDeleteFunction
+#include "orionld/db/dbConfiguration.h"                          // dbEntityListLookupWithIdTypeCreDate
 
 
 
 // ----------------------------------------------------------------------------
 //
-// dbEntityBatchDelete -
+// dbEntityListLookupWithIdTypeCreDate -
 //
-extern DbEntityBatchDeleteFunction dbEntityBatchDelete;
+extern dbEntityListLookupWithIdTypeCreDate dbEntityListLookupWithIdTypeCreDate;
 
-#endif  // SRC_LIB_ORIONLD_DB_DBENTITYBATCHDELETE_H_
+#endif  // SRC_LIB_ORIONLD_DB_DBENTITYLISTLOOKUPWITHIDTYPECREDATE_H
