@@ -349,6 +349,22 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
+
+      - uses: jungwinter/split@v1
+        id: split
+        with:
+          msg: ${{ steps.extract_branch.outputs.branch }}
+          seperator: /
+
+      - name: Decide tag
+        id: tag
+        run: |
+          echo "::set-output name=tag::$(if [ "${{ steps.split.outputs._0 }}" = "release" ] ; then echo "${{ steps.split.outputs._1 }}" ; else echo "latest" ; fi)"
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
 
