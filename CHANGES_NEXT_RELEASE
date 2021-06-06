@@ -1,2 +1,3 @@
-* Issue  #857   Relationship without 'object' field in notifications
-* Issue  #280   Connection Pool for TRoE
+* Issue  #857   Bug fix: Relationship without 'object' field in notifications
+* Issue  #280   Connection Pool for TRoE, making the broker running with TRoE only about 20% slower than without
+* Issue  #280   General perfomance improvements
