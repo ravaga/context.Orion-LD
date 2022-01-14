@@ -30,19 +30,16 @@ jobs:
 
     steps:
 
-      - name: Get latest Github release
-        id: latest-release
-        uses: InsonusK/get-latest-release@v1.0.1
+      - id: bump
+        uses: zwaldowski/match-label-action@v1
         with:
-          myToken: ${{ secrets.GITHUB_TOKEN }}
-          exclude_types: draft|prerelease
+          allowed: major,minor,patch
 
       - uses: zwaldowski/semver-release-action@v2
         with:
           dry_run: true
-          bump: ${{ steps.latest-release.outputs.tag_name }}
+          bump: ${{ steps.bump.outputs.match }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
-
 
       - name: Set version output
         id: out
