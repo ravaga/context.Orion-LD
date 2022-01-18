@@ -65,7 +65,7 @@ jobs:
       fail-fast: false
       matrix:
         # since the test are very slow, we use a very high degree of parallelism
-        testIndexToStartAt: [0]
+        testIndexToStartAt: [50]
     steps:
       - uses: actions/checkout@v2
 
@@ -84,4 +84,4 @@ jobs:
 
       - name: Execute valgrind
         run: |
-          docker run --rm --network host -v $(pwd):/opt/orion -e CB_FT_VERBOSE=true -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts -e CB_FT_VERBOSE=ON  --entrypoint bash ${{ env.IMAGE_NAME }} /opt/orion/test/valgrind/valgrindTestSuite.sh -fromIx ${{ matrix.testIndexToStartAt }} -toIx ${{ matrix.testIndexToStartAt }}+2
+          docker run --rm --network host -v $(pwd):/opt/orion -e CB_FT_VERBOSE=true -e ORIONLD_CACHED_CONTEXT_DIRECTORY=/opt/orion/ldcontexts -e CB_FT_VERBOSE=ON  --entrypoint bash ${{ env.IMAGE_NAME }} /opt/orion/test/valgrind/valgrindTestSuite.sh -v -fromIx ${{ matrix.testIndexToStartAt }} -toIx ${{ matrix.testIndexToStartAt }}+5
