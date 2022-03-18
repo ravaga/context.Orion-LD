@@ -19,7 +19,7 @@ sudo aptitude install python-openssl
 
 3. Install **Flask**:
 ```bash
-wget https://bootstrap.pypa.io/pip/2.7/get-pip.py
+sudo wget https://bootstrap.pypa.io/pip/2.7/get-pip.py
 python2.7 get-pip.py
 pip install Flask
 pip install paho-mqtt
