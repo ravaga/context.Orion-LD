@@ -58,11 +58,13 @@ bool mongocTenantsGet(void)
 
   bson_append_int32(&command, "listDatabases", 13, 1);
 
+  LM_TMP(("Sending 'listDatabases' command to mongoc"));
   bool b = mongoc_client_read_command_with_opts(orionldState.mongoc.client, "admin", &command, NULL, NULL, &reply, &mcError);
   if (b == false)
-    LM_RE(false, ("Database Error ()", mcError.message));
+    LM_RE(false, ("Database Error (%s)", mcError.message));
 
-  LM_TMP(("mongoc_client_read_command_with_opts worked"));
+  LM_TMP(("Got 'listDatabases' command response"));
+
   char*   title;
   char*   detail;
   KjNode* responseP = mongocKjTreeFromBson(&reply, &title, &detail);
@@ -83,10 +85,8 @@ bool mongocTenantsGet(void)
   {
     KjNode* nameP = kjLookup(dbP, "name");
 
-    if (nameP == NULL)
-      continue;
-    if (nameP->type != KjString)
-      continue;
+    if (nameP       == NULL)      continue;
+    if (nameP->type != KjString)  continue;
 
     if (strncmp(nameP->value.s, dbName, dbNameLen) == 0)
     {

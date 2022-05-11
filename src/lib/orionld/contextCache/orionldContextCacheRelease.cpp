@@ -52,11 +52,11 @@ void orionldContextCacheRelease(void)
     ++freed;
     if (orionldContextCache[ix]->tree != NULL)
     {
-      LM_TMP(("VL: FREE(%d, context '%s', tree:%p): %d", freed, orionldContextCache[ix]->url, orionldContextCache[ix]->tree));
+      LM_TMP(("VL: FREE(%d, context '%s', tree:%p)", freed, orionldContextCache[ix]->url, orionldContextCache[ix]->tree));
       kjFree(orionldContextCache[ix]->tree);
       orionldContextCache[ix]->tree = NULL;
     }
     else
-      LM_TMP(("VL: NFRE(%d, context '%s', tree:NULL): %d", freed, orionldContextCache[ix]->url));
+      LM_TMP(("VL: NFRE(%d, context '%s', tree:NULL)", freed, orionldContextCache[ix]->url));
   }
 }
