@@ -705,6 +705,7 @@ static SemOpType policyGet(std::string mutexPolicy)
 *
 * notificationModeParse -
 */
+#if 1
 static void notificationModeParse(char *notifModeArg, int *pQueueSize, int *pNumThreads)
 {
   char* mode;
@@ -751,7 +752,34 @@ static void notificationModeParse(char *notifModeArg, int *pQueueSize, int *pNum
 
   free(mode);
 }
+#else
+static void notificationModeParse(char* notificationMode, int* pQueueSize, int* pNumThreads)
+{
+  if (strncmp(notificationMode, "threadpool", 10) == 0)
+  {
+    if (notificationMode[10] == 0)
+    {
+      *pQueueSize  = DEFAULT_NOTIF_QS;
+      *pNumThreads = DEFAULT_NOTIF_TN;
+      return;
+    }
+    else if (notificationMode[10] == ':')
+    {
+      notificationMode[10] = 0;
+      char* colon2 = strchr(&notificationMode[11], ':');
 
+      if (colon2 == NULL)
+        LM_X(1, ("Invalid notificationMode (first colon found, second is missing)"));
+      *pQueueSize  = atoi(&notificationMode[11]);
+      *pNumThreads = atoi(&colon2[1]);
+    }
+    else
+      LM_X(1, ("Invalid notificationMode '%s'", notificationMode));
+  }
+  else if ((strcmp(notificationMode, "transient") != 0) && (strcmp(notificationMode, "persistent") != 0))
+    LM_X(1, ("Invalid notificationMode '%s'", notificationMode));
+}
+#endif
 
 
 // -----------------------------------------------------------------------------
