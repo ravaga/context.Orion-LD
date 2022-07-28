@@ -990,7 +990,11 @@ int main(int argC, char* argV[])
     }
   }
 
+  LM(("1178: Calling notificationModeParse('%s')", notificationMode));
   notificationModeParse(notificationMode, &notificationQueueSize, &notificationThreadNum);
+  LM(("1178: notificationQueueSize: %d",   notificationQueueSize));
+  LM(("1178: notificationThreadNum: %d",   notificationThreadNum));
+  LM(("1178: notificationMode:      '%s'", notificationMode));
 
   LM_I(("Orion Context Broker is running"));
 
