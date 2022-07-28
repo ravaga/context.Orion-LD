@@ -40,7 +40,7 @@
 */
 QueueNotifier::QueueNotifier(size_t queueSize, int numThreads): queue(queueSize), workers(&queue, numThreads)
 {
-  LM_T(LmtNotifier,("Setting up queue and threads for notifications"));
+  LM(("1178: Setting up queue and threads for notifications"));
 }
 
 
@@ -73,6 +73,7 @@ void QueueNotifier::sendNotifyContextRequest
   bool                             blacklist
 )
 {
+  LM(("1178: httpInfo.url: '%s'", httpInfo.url.c_str()));
   std::vector<SenderThreadParams*>* paramsV = Notifier::buildSenderParams(ncr,
                                                                           httpInfo,
                                                                           tenant,

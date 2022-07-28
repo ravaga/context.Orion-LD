@@ -609,10 +609,12 @@ static void contextBrokerInit(std::string dbPrefix, bool multitenant)
     }
 
     pNotifier = pQNotifier;
+    LM(("1178: using threadpool for notifications (Q-Size: %d, Threads: %d", notificationQueueSize, notificationThreadNum));
   }
   else
   {
     pNotifier = new Notifier();
+    LM(("1178: no threadpool for notifications"));
   }
 
   /* Set notifier object (singleton) */
