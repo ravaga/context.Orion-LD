@@ -598,23 +598,22 @@ static void contextBrokerInit(std::string dbPrefix, bool multitenant)
   Notifier* pNotifier = NULL;
 
   /* If we use a queue for notifications, start worker threads */
+  LM(("1178: notificationMode == '%s'", notificationMode));
   if (strcmp(notificationMode, "threadpool") == 0)
   {
     QueueNotifier*  pQNotifier = new QueueNotifier(notificationQueueSize, notificationThreadNum);
     int             rc         = pQNotifier->start();
 
     if (rc != 0)
-    {
       LM_X(1,("Runtime Error starting notification queue workers (%d)", rc));
-    }
 
     pNotifier = pQNotifier;
-    LM(("1178: using threadpool for notifications (Q-Size: %d, Threads: %d", notificationQueueSize, notificationThreadNum));
+    LM(("1178: using threadpool for notifications (Q-Size: %d, Threads: %d), notifier at %p", notificationQueueSize, notificationThreadNum, pNotifier));
   }
   else
   {
     pNotifier = new Notifier();
-    LM(("1178: no threadpool for notifications"));
+    LM(("1178: no threadpool for notifications (notificationMode == '%s'), notifier at %p", notificationMode, pNotifier));
   }
 
   /* Set notifier object (singleton) */
@@ -705,7 +704,7 @@ static SemOpType policyGet(std::string mutexPolicy)
 *
 * notificationModeParse -
 */
-#if 1
+#if 0
 static void notificationModeParse(char *notifModeArg, int *pQueueSize, int *pNumThreads)
 {
   char* mode;
