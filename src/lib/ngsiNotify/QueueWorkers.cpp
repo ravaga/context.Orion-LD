@@ -25,7 +25,6 @@
 #include <pthread.h>
 
 #include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
 
 #include "common/clockFunctions.h"
 #include "common/statistics.h"
@@ -127,22 +126,10 @@ static void* workerFunc(void* pSyncQ)
       strcpy(transactionId, params->transactionId);
 
       LM(("1178: protocol: '%s'", params->protocol.c_str()));
-      LM_T(LmtNotifier, ("worker sending '%s' message to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', path='%s', content-type: %s",
-                         params->protocol.c_str(),
-                         params->ip.c_str(),
-                         params->port,
-                         params->verb.c_str(),
-                         params->tenant.c_str(),
-                         params->servicePath.c_str(),
-                         params->xauthToken.c_str(),
-                         params->resource.c_str(),
-                         params->content_type.c_str()));
-
       int r = 0;
 
       if (simulatedNotification)
       {
-        LM_T(LmtNotifier, ("simulatedNotification is 'true', skipping outgoing request"));
         __sync_fetch_and_add(&noOfSimulatedNotifications, 1);
       }
       else if (params->protocol == "mqtt")  // Notification to be sent via MQTT broker

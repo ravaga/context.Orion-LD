@@ -145,4 +145,3 @@ export CP2_DB_NAME=${CP2_DB_NAME:-ftest_cp2}
 export CP3_DB_NAME=${CP3_DB_NAME:-ftest_cp3}
 export CP4_DB_NAME=${CP4_DB_NAME:-ftest_cp4}
 export CP5_DB_NAME=${CP5_DB_NAME:-ftest_cp5}
- 
