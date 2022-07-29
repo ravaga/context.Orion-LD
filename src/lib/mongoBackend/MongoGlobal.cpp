@@ -464,6 +464,7 @@ void releaseMongoConnection(DBClientBase* connection)
 */
 Notifier* getNotifier()
 {
+  LM(("1178: Returning notifier at %p", notifier));
   return notifier;
 }
 
@@ -475,6 +476,7 @@ Notifier* getNotifier()
 */
 void setNotifier(Notifier* n)
 {
+  LM(("1178: Setting notifier to %p", n));
   notifier = n;
 }
 
