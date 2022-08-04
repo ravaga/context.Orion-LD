@@ -63,7 +63,7 @@ echo
 echo
 
 
-echo "03. PATCH the entity making the attribute 'category' an array	with two strings"
+echo "03. PATCH the entity making the attribute 'category' an array with two strings"
 echo "=============================================================================="
 payload='{
   "category": [ "actuator", "sensor" ]
@@ -109,7 +109,7 @@ Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/pub
 }
 
 
-03. PATCH the entity making the attribute 'category' an array	with two strings
+03. PATCH the entity making the attribute 'category' an array with two strings
 ==============================================================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)

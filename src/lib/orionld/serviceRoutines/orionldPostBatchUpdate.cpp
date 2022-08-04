@@ -197,7 +197,7 @@ bool orionldPostBatchUpdate(void)
       continue;
     }
 
-    // If @context inpayload body, it needs to be respected
+    // If @context in payload body, it needs to be respected
     KjNode* contextNodeP  = kjLookup(entityP, "@context");
     if (contextNodeP != NULL)
       orionldState.contextP = orionldContextFromTree(NULL, OrionldContextFromInline, NULL, contextNodeP);

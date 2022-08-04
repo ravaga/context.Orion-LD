@@ -35,6 +35,8 @@ extern "C"
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/kjTree/kjTimestampAdd.h"                       // kjTimestampAdd
 #include "orionld/kjTree/kjArrayAdd.h"                           // kjArrayAdd
+#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
+#include "orionld/kjTree/kjChildPrepend.h"                       // kjChildPrepend
 #include "orionld/dbModel/dbModelFromApiAttribute.h"             // dbModelFromApiAttribute
 #include "orionld/dbModel/dbModelFromApiEntity.h"                // Own interface
 
@@ -81,17 +83,28 @@ extern "C"
 bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbAttrsP, KjNode* dbAttrNamesP, bool creation)
 {
   KjNode*      nodeP;
-  const char*  mustGo[] = { "_id", "id", "@id", "type", "@type", "scope", "createdAt", "modifiedAt", "creDate", "modDate" };
+  const char*  mustGo[] = { "_id", "id", "@id", "type", "@type", "servicePath", "scope", "createdAt", "modifiedAt", "creDate", "modDate" };
 
   //
   // Remove any non-attribute nodes from the incoming tree (entityP)
   // PATCH-able toplevel fields (type? scope?) would need to be removed and saved. Later reintroduce into entityP
+  // If CREATION - id/@id and type/@type need to be preserved
   //
+  KjNode* eidNodeP   = NULL;
+  KjNode* etypeNodeP = NULL;
+
   for (unsigned int ix = 0; ix < sizeof(mustGo) / sizeof(mustGo[0]); ix++)
   {
     nodeP = kjLookup(entityP, mustGo[ix]);
     if (nodeP != NULL)
+    {
+      if ((ix == 1) || (ix == 2))
+        eidNodeP = nodeP;
+      else if ((ix == 3) || (ix == 4))
+        etypeNodeP = nodeP;
+
       kjChildRemove(entityP, nodeP);
+    }
   }
 
 
@@ -179,7 +192,28 @@ bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbAttrsP, KjNode* dbAttrNames
     KjNode* lastCorrelatorP = kjString(orionldState.kjsonP,  "lastCorrelator", "");
     kjChildAdd(entityP, lastCorrelatorP);
 
-    // _id ...
+    //
+    // _id with id, type, and servicePath
+    //
+    kjTreeLog(entityP, "DB Entity before _id");
+
+    KjNode* _idNodeP         = kjObject(orionldState.kjsonP, "_id");
+    KjNode* servicePathNodeP = kjString(orionldState.kjsonP, "servicePath", "/");
+
+    //
+    // For e.g. POST /entities, the entity type and attribute are removed from the payload body
+    // and saved instead in the orionldState thread variable
+    //
+    if (eidNodeP   == NULL)  eidNodeP   = orionldState.payloadIdNode;
+    if (etypeNodeP == NULL)  etypeNodeP = orionldState.payloadTypeNode;
+
+    kjChildAdd(_idNodeP, eidNodeP);
+    kjChildAdd(_idNodeP, etypeNodeP);
+    kjChildAdd(_idNodeP, servicePathNodeP);
+
+    kjChildPrepend(entityP, _idNodeP);
+
+    kjTreeLog(entityP, "DB Entity after _id");
   }
 
   return true;

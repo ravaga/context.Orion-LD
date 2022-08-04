@@ -30,7 +30,6 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
-#include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "orionld/types/OrionldResponseErrorType.h"              // OrionldResponseErrorType
 #include "orionld/common/orionldState.h"                         // orionldState
@@ -80,6 +79,8 @@ void entityErrorPush
         return;
     }
   }
+
+  LM_W(("Rejected an Entity from a BATCH Array: %s: %s", title, detail));
 
   KjNode* objP            = kjObject(orionldState.kjsonP, NULL);
   KjNode* eIdP            = kjString(orionldState.kjsonP,  "entityId", entityId);

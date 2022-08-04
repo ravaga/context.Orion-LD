@@ -135,21 +135,48 @@ static OrionldAttributeType attrTypeFromDb(KjNode* dbAttrsP, char* attrName)
 
 // -----------------------------------------------------------------------------
 //
-// pCheckEntity -
+// pCheckEntity - check the validity of the payload body of an NGSI-LD Entity
 //
-// When an entity is created (dbEntityP == NULL), the "type" and "id" are Mandatory:
-//   - POST /entities
-//   - POST /entityOperations/create
-//   - POST /entityOperations/upsert   (possibly)
+// FIXME: the function should be amended to include also checks for enmtity id and type.
+//        However, this is more than complex ...
 //
-// When an entity is updated:
-//   - For the Entity ID:
-//     - POST /entities/{entityId}/attrs:    "id" can't be present - it's already in the URL PATH
-//     - PATCH /entities/{entityId}/attrs:   "id" can't be present - it's already in the URL PATH
-//     - BATCH Upsert/Update:                "id" must be present - can't find the entity otherwise ...
+//        Potentially used by:
+//        1.  POST   /entities
+//        2.  POST   /entities/{eid}/attrs
+//        3.  POST   /entityOperations/create
+//        4.  POST   /entityOperations/upsert
+//        5.  POST   /entityOperations/update
+//        6.  POST   /ngsi-ld/v1/temporal/entities
+//        7.  POST   /ngsi-ld/v1/temporal/entities/{eid}/attrs   (Not Supported right now)
+//        8.  PUT    /entities/{eid}
+//        9.  PATCH  /entities/{eid}/attrs
+//        10. PATCH  /entities/{eid}
 //
-//   - For the Entity TYPE:
-//     POST /entities/{entityId}/attrs:      if "type" is present, it needs to coincide with what's in the DB
+//        Requisities:
+//        1.  "id+type" must be present - but they're already removed from the body
+//        2.  "id" cannot be present in the payload body.
+//            "type" can be but must in suich case coincide with the old type (until multityping is implemented)
+//            the "id" from the URL must be a valid URI AND, the entity must exist in the database
+//        3.  "id+type" must be present
+//        4.  "id" must be present
+//            "type" must be present if the entity is to be created (not found in dbAttrsP)
+//            "type" can be present if the entity is to be updated but must in suich case coincide with the old type
+//        5.  "id" must be present
+//            "type" can be present but must in such case coincide with the old type
+//        6.  "id+type" must be present - but they're already removed from the body
+//        7.  Not Supported
+//        8.  "id" cannot be present.
+//            "type" can be present but must in such case coincide with the old type
+//
+//        typedef enum EntityFieldSituation
+//        {
+//          FROM_WILDCARD,                    // FORBIDDEN in BODY
+//          ALREADY_EXTRACTED,
+//          MANDATORY_IN_BODY,
+//          FORBIDDEN,
+//          PERMITTED_BUT_MUST_COINCIDE      // Only Entity TYPE
+//        } EntityFieldSituation;
+//
 //
 bool pCheckEntity
 (

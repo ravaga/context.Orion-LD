@@ -126,25 +126,6 @@ bool orionldPostEntities(void)
   if (orionldState.datasets != NULL)
     kjChildAdd(dbEntityP, orionldState.datasets);
 
-  //
-  // Put Entity ID and TYPE back - inside _id as first members of the tree
-  //
-  KjNode* _idNodeP         = kjObject(orionldState.kjsonP, "_id");
-  KjNode* entityIdNodeP    = kjString(orionldState.kjsonP, "id",          entityId);
-  KjNode* entityTypeNodeP  = kjString(orionldState.kjsonP, "type",        entityType);
-  KjNode* servicePathNodeP = kjString(orionldState.kjsonP, "servicePath", "/");  // NGSIv2 backwards compatibility
-
-  // Insert the three in _idNodeP
-  entityIdNodeP->next          = entityTypeNodeP;
-  entityTypeNodeP->next        = servicePathNodeP;
-  servicePathNodeP->next       = NULL;
-  _idNodeP->value.firstChildP  = entityIdNodeP;
-  _idNodeP->lastChild          = servicePathNodeP;
-
-  // "Chain-in" _idNodeP as 1st member of dbEntityP
-  _idNodeP->next               = dbEntityP->value.firstChildP;
-  dbEntityP->value.firstChildP = _idNodeP;
-
   // Ready to send it to the database
   if (mongocEntityInsert(dbEntityP, entityId) == false)
   {
