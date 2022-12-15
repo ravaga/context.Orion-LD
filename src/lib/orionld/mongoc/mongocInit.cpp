@@ -143,17 +143,6 @@ static char* uriCompose
   char* compV[50];
   int   compNo = 0;
 
-  LM(("dbURI:           '%s'", dbURI));
-  LM(("dbHost:          '%s'", dbHost));
-  LM(("dbUser:          '%s'", dbUser));
-  LM(("dbPwd:           '%s'", dbPwd));
-  LM(("dbAuthDb:        '%s'", dbAuthDb));
-  LM(("dbReplicaSet:    '%s'", dbReplicaSet));
-  LM(("dbAuthMechanism: '%s'", dbAuthMechanism));
-  LM(("dbSSL:           '%s'", (dbSSL == true)? "true" : "false"));
-  LM(("tlsCertificate:  '%s'", tlsCertificateFilePath));
-
-
   if (dbURI[0] != 0)
   {
     //
@@ -247,7 +236,6 @@ static char* uriCompose
     len += strlen(compV[ix]);
   }
 
-  LM(("mongo uri: %s", uri));
   return uri;
 }
 
@@ -286,7 +274,7 @@ void mongocInit
   char*         mongoUri = uriCompose(dbURI, dbHost, dbUser, dbPwd, dbAuthDb, dbReplicaSet, dbAuthMechanism, dbSSL, tlsCertificateFilePath);
   bson_error_t  mongoError;
 
-  LM_K(("Connecting to mongo for the C driver, with URI '%s'", mongoUri));
+  LM_K(("Connecting to mongo using the C driver (mongoc)"));
   mongocUri = mongoc_uri_new_with_error(mongoUri, &mongoError);
   if (mongocUri == NULL)
     LM_X(1, ("Unable to connect to mongo(URI: %s): %s", mongoUri, mongoError.message));
