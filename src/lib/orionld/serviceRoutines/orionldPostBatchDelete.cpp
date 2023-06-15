@@ -30,6 +30,7 @@ extern "C"
 #include "kjson/kjRender.h"                                    // kjFastRender
 #include "kjson/kjRenderSize.h"                                // kjFastRenderSize
 #include "kjson/kjParse.h"                                     // kjParse
+#include "kjson/kjClone.h"                                     // kjClone
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
@@ -69,6 +70,60 @@ static KjNode* eidLookup(KjNode* eidP, const char* entityId)
   }
 
   return NULL;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// alterations -
+//
+static void alterations(KjNode* eidV, KjNode* entityIdAndTypeTable)
+{
+  //
+  // Create the alterations (for later notifications)
+  //
+  for (KjNode* eidNodeP = eidV->value.firstChildP; eidNodeP != NULL; eidNodeP = eidNodeP->next)
+  {
+    OrionldAlteration* altP     = (OrionldAlteration*) kaAlloc(&orionldState.kalloc, sizeof(OrionldAlteration));
+    char*              entityId = eidNodeP->value.s;
+
+    // Initialize
+    bzero(altP, sizeof(OrionldAlteration));
+    altP->entityId = entityId;
+
+    // Get entity type from 'entityIdAndTypeTable'
+    KjNode* pairP = kjLookup(entityIdAndTypeTable, entityId);
+    if (pairP != NULL)
+      altP->entityType = pairP->value.s;
+    else
+      altP->entityType = NULL;
+
+    // Queue into orionldState.alterations
+    if (orionldState.alterations != NULL)
+      altP->next = orionldState.alterations;
+    orionldState.alterations = altP;
+
+    //
+    // Create a payload body to represent the deletion (to be sent as notification later)
+    //
+    KjNode* apiEntityP      = kjObject(orionldState.kjsonP, NULL);  // Used for notifications, if needed
+    KjNode* idNodeP         = kjString(orionldState.kjsonP, "id", entityId);
+    KjNode* deletedAtNodeP  = kjString(orionldState.kjsonP, "deletedAt", orionldState.requestTimeString);
+
+    kjChildAdd(apiEntityP, idNodeP);
+    kjChildAdd(apiEntityP, deletedAtNodeP);
+
+    if (altP->entityType != NULL)
+    {
+      KjNode* typeNodeP = kjString(orionldState.kjsonP, "type", altP->entityType);
+      kjChildAdd(apiEntityP, typeNodeP);
+    }
+
+    altP->finalApiEntityP = apiEntityP;
+
+    LM(("NOT: Added an alteration for entity id '%s'", entityId));
+  }
 }
 
 
@@ -256,16 +311,8 @@ static KjNode* entityIdLookupInObjectArray(KjNode* objectArray, char* entityId)
 //
 static void responseMerge(DistOp* drP, KjNode* responseSuccess, KjNode* responseErrors)
 {
-  kjTreeLog(drP->body, "KZ: drP->body BEFORE");
-  kjTreeLog(responseSuccess, "KZ: responseSuccess BEFORE");
-  kjTreeLog(responseErrors, "KZ: responseErrors BEFORE");
-  LM(("KZ: drP->httpResponseCode == %d", drP->httpResponseCode));
-
   if (drP->httpResponseCode == 204)
   {
-    LM(("KZ: 204 - move all drP->body entity ids from drP to responseSuccess"));
-    LM(("KZ: 204 - remove all drP->body entity ids from responseErrors"));
-
     for (KjNode* eidNodeP = drP->body->value.firstChildP; eidNodeP != NULL; eidNodeP = eidNodeP->next)
     {
       KjNode* nodeP;
@@ -286,9 +333,6 @@ static void responseMerge(DistOp* drP, KjNode* responseSuccess, KjNode* response
   }
   else if (drP->httpResponseCode == 207)
   {
-    LM(("KZ: 207 - move all drP->responseBody::success entity ids from drP to responseSuccess"));
-    LM(("KZ: 207 - move all drP->responseBody::errors entity ids from drP to responseErrors"));
-
     KjNode* successV = kjLookup(drP->responseBody, "success");
     KjNode* errorsV  = kjLookup(drP->responseBody, "errors");
 
@@ -320,25 +364,25 @@ static void responseMerge(DistOp* drP, KjNode* responseSuccess, KjNode* response
       {
         KjNode* eidNodeP = kjLookup(errorBodyP, "entityId");
 
-        if (eidNodeP != NULL)
+        if (eidNodeP == NULL)
+          continue;
+
+        KjNode* oldErrorItemP = entityIdLookupInObjectArray(responseErrors, eidNodeP->value.s);
+
+        if (oldErrorItemP == NULL)
         {
-          KjNode* oldErrorItemP = entityIdLookupInObjectArray(responseErrors, eidNodeP->value.s);
+          LM(("KZ: Entity ID '%s' is added to responseErrors (unless it's already in the successArray)", eidNodeP->value.s));
 
-          if (oldErrorItemP == NULL)
+          if (kjStringValueLookupInArray(responseSuccess, eidNodeP->value.s) == NULL)
           {
-            LM(("KZ: Entity ID '%s' is added to responseErrors (unless it's already in the successArray)", eidNodeP->value.s));
+            kjChildRemove(errorsV, errorBodyP);
+            kjChildAdd(responseErrors, errorBodyP);
 
-            if (kjStringValueLookupInArray(responseSuccess, eidNodeP->value.s) == NULL)
+            KjNode* registrationIdNodeP = kjLookup(errorBodyP, "registrationId");
+            if (registrationIdNodeP == NULL)
             {
-              kjChildRemove(errorsV, errorBodyP);
-              kjChildAdd(responseErrors, errorBodyP);
-
-              KjNode* registrationIdNodeP = kjLookup(errorBodyP, "registrationId");
-              if (registrationIdNodeP == NULL)
-              {
-                registrationIdNodeP = kjString(orionldState.kjsonP, "registrationId", drP->regP->regId);
-                kjChildAdd(errorBodyP, registrationIdNodeP);
-              }
+              registrationIdNodeP = kjString(orionldState.kjsonP, "registrationId", drP->regP->regId);
+              kjChildAdd(errorBodyP, registrationIdNodeP);
             }
           }
         }
@@ -349,10 +393,6 @@ static void responseMerge(DistOp* drP, KjNode* responseSuccess, KjNode* response
   {
     LM(("%d - like 204 but to responseErrors instead of responseSuccess ...", drP->httpResponseCode));
   }
-
-  kjTreeLog(drP->body, "KZ: drP->body AFTER");
-  kjTreeLog(responseSuccess, "KZ: responseSuccess AFTER");
-  kjTreeLog(responseErrors, "KZ: responseErrors AFTER");
 }
 
 
@@ -411,8 +451,9 @@ bool orionldPostBatchDelete(void)
   // Simplify the DB _id array to an KV object   "entityId": "entityType "
   kjTreeLog(dbEntityIdArray, "Existing Entities from DB");
 
-  KjNode* entityIdAndTypeTable = NULL;
-  bool   dbOperationOk         = false;
+  KjNode* entityIdAndTypeTable   = NULL;
+  KjNode* locallyDeletedEntities = NULL;
+  bool   dbOperationOk           = false;
 
   if ((dbEntityIdArray == NULL) || (dbEntityIdArray->value.firstChildP == NULL))
   {
@@ -424,6 +465,7 @@ bool orionldPostBatchDelete(void)
     kjTreeLog(entityIdAndTypeTable, "entityIdAndTypeTable");
 
     responseSuccess = entityIdAndTypeTableToIdArray(entityIdAndTypeTable);
+    locallyDeletedEntities = kjClone(orionldState.kjsonP, responseSuccess);
     dbOperationOk = mongocEntitiesDelete(responseSuccess);
     if (dbOperationOk == false)
     {
@@ -609,7 +651,10 @@ bool orionldPostBatchDelete(void)
   // o if any error - 207
   //
   if (responseErrors->value.firstChildP == NULL)
+  {
     orionldState.httpStatusCode  = 204;
+    LM(("NOT: it's a 204 - responseSuccess might contain non-local entity ids ..."));
+  }
   else
   {
     KjNode* response = kjObject(orionldState.kjsonP, NULL);
@@ -627,14 +672,21 @@ bool orionldPostBatchDelete(void)
       // In the case of 207, and especially if Distributed Operations, then the "responseSuccess" is the array with that information.
       // Luckily it has the exact format that troePostBatchDelete needs, so, we just make 'orionldState.requestTree' point to 'responseSuccess'.
       //
-      orionldState.requestTree = responseSuccess;
+      orionldState.requestTree = locallyDeletedEntities;
     }
 
     kjTreeLog(responseSuccess, "responseSuccess");
+    LM(("NOT: it's a 207"));
   }
 
   orionldState.out.contentType = JSON;
   orionldState.noLinkHeader    = true;
+
+  if (locallyDeletedEntities != NULL)
+  {
+    kjTreeLog(locallyDeletedEntities, "NOT: Checking Subs for notification for the locally deleted entities");
+    alterations(locallyDeletedEntities, entityIdAndTypeTable);
+  }
 
   return true;
 }

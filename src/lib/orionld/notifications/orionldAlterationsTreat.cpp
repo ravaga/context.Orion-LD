@@ -168,7 +168,6 @@ static NotificationPending* notificationLookupByCurlHandle(NotificationPending* 
 void orionldAlterationsTreat(OrionldAlteration* altList)
 {
 #if 0
-  // <DEBUG>
   int alterations = 0;
   for (OrionldAlteration* aP = altList; aP != NULL; aP = aP->next)
   {
@@ -188,8 +187,6 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
     kjTreeLog(aP->inEntityP, "ALT:   inEntityP");
     ++alterations;
   }
-  LM(("ALT: %d Alterations present", alterations));
-  // </DEBUG>
 #endif
 
 
@@ -209,7 +206,7 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   //
   NotificationPending* notificationList = NULL;
 
-#ifdef DEBUG
+#if 0
   int ix = 1;
   LM(("%d items in matchList:", matches));
   for (OrionldAlterationMatch* matchP = matchList; matchP != NULL; matchP = matchP->next)
@@ -425,7 +422,6 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
         // Using curl_multi_wait instead.
         // For now, at least
         //
-        LM(("Calling curl_multi_wait"));
         cm = curl_multi_wait(orionldState.multiP, NULL, 0, 1000, NULL);
         if (cm != 0)
           LM_E(("curl_multi_poll error %d", cm));
@@ -436,7 +432,6 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
     CURLMsg* msgP;
     int      msgsLeft;
 
-    LM(("Reading out the results of the notifications"));
     while ((msgP = curl_multi_info_read(orionldState.multiP, &msgsLeft)) != NULL)
     {
       if (msgP->msg != CURLMSG_DONE)

@@ -1507,7 +1507,6 @@ char* lmTraceGet(char* levelString, int levelStringSize)
 
   if (levelString == NULL)
   {
-    LOG_OUT(("returning NULL"));
     return NULL;
   }
 
@@ -1517,14 +1516,12 @@ char* lmTraceGet(char* levelString, int levelStringSize)
   {
     if (tLevel[i] == true)
     {
-      LOG_OUT(("GET: trace level %d is set", i));
       levels[j++] = i;
     }
   }
 
   if (j == 0)
   {
-    LOG_OUT(("returning '%s'", levelString));
     snprintf(levelString, levelStringSize, "empty");
     return levelString;
   }

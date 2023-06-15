@@ -37,7 +37,7 @@ accumulatorStart --pretty-print
 # 02b. Create a subscription S2 for the accumulator, on entity type T + entity id urn:E1, for deletions
 # 02c. Create a subscription S3 for the accumulator, on entity type T + entity id urn:E2, for deletions
 # 02d. Create a subscription S4 for the accumulator, on entity type T2 + entity id urn:E1, for deletions
-# 03.  Delete urn:E1
+# 03.  Delete urn:E1, using POST BATCH DELETE
 # 04.  Dump the accumulator, see two notifications on Entity deletion for urn:E1
 #
 
@@ -143,9 +143,12 @@ echo
 echo
 
 
-echo "03. Delete urn:E1"
-echo "================="
-orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X DELETE
+echo "03. Delete urn:E1, using POST BATCH DELETE"
+echo "=========================================="
+payload='[
+  "urn:E1"
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/delete --payload "$payload"
 echo
 echo
 
@@ -203,8 +206,8 @@ Location: /ngsi-ld/v1/subscriptions/urn:S4
 
 
 
-03. Delete urn:E1
-=================
+03. Delete urn:E1, using POST BATCH DELETE
+==========================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
 

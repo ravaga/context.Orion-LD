@@ -1146,7 +1146,7 @@ OrionldAlterationMatch* subCacheAlterationMatch(OrionldAlteration* alterationLis
         if (entityIdMatch(subP, altP->entityId, eItems) == false)
           continue;
 
-        if (entityTypeMatch(subP, altP->entityType, eItems) == false)
+        if ((altP->entityType != NULL) && (entityTypeMatch(subP, altP->entityType, eItems) == false))
           continue;
       }
 
