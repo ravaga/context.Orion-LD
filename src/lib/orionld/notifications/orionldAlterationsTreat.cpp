@@ -466,7 +466,7 @@ static NotificationPending* notificationLookupByCurlHandle(NotificationPending* 
 //
 void orionldAlterationsTreat(OrionldAlteration* altList)
 {
-#if 1
+#if 0
   // <DEBUG>
   int alterations = 0;
   for (OrionldAlteration* aP = altList; aP != NULL; aP = aP->next)
@@ -484,7 +484,7 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
       LM_T(LmtAlt, ("   Alteration Type: %s", orionldAlterationType(aP->alteredAttributeV[ix].alterationType)));
     }
 
-    kjTreeLog(aP->inEntityP, "ALT:   inEntityP", LmtAlt);  // outdeffed
+    kjTreeLog(aP->inEntityP, "ALT:   inEntityP", LmtAlt);
     ++alterations;
   }
   LM_T(LmtAlt, (" %d Alterations present", alterations));

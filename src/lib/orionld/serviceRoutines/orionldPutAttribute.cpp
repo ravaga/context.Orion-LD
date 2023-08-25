@@ -204,7 +204,6 @@ bool orionldPutAttribute(void)
 
   // Set creDate (mongocAttributeReplace sets modDate)
   dbModelAttributeCreatedAtSet(orionldState.requestTree, createdAt);
-  kjTreeLog(orionldState.requestTree, "orionldState.requestTree", LmtSR);
 
   // Write to mongo
   if (mongocAttributeReplace(entityId, orionldState.requestTree, &detail) == false)

@@ -520,9 +520,7 @@ bool apiEntitySimplifiedToNormalized(KjNode* apiEntityFragmentP, KjNode* dbAttrs
             }
           }
 
-          kjTreeLog(attrP, "Attribute BEFORE attributeTransform", LmtSR);
           attributeTransform(attrP, attrTypeFromDb, dbAttrTypeP->value.s, orionldState.uriParams.lang);
-          kjTreeLog(attrP, "Attribute AFTER attributeTransform", LmtSR);
         }
         else if ((attrTypeFromDb == Property) && (attrP->type == KjObject))
         {

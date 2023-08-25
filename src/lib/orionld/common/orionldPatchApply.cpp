@@ -208,7 +208,6 @@ void orionldPatchApply(KjNode* patchBase, KjNode* patchP, bool api)
   if (pathNode->type != KjString) return;
 
   LM_T(LmtPatchEntity, ("Applying patch for '%s'", pathNode->value.s));
-  // kjTreeLog(patchBase, "patchBase", LmtPatchEntity);
 
   char* compV[7];
   bool  skip       = false;

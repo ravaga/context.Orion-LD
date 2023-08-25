@@ -70,8 +70,6 @@ static void subCacheItemFill
   RenderFormat         renderFormat
 )
 {
-  kjTreeLog(apiSubscriptionP, "apiSubscriptionP", LmtSR);
-
   cSubP->tenant              = (tenant == NULL || *tenant == 0)? NULL : strdup(tenant);
   cSubP->servicePath         = strdup("/#");
   cSubP->qP                  = qTree;
@@ -434,8 +432,6 @@ static CachedSubscription* subCacheApiSubscriptionUpdate
 {
   LM_T(LmtSubCacheSync, ("Updating Cached Subscription (%p) from DB", cSubP));
 
-  kjTreeLog(apiSubscriptionP, "apiSubscription", LmtSubCacheSync);
-
   KjNode* modifiedAtNode = kjLookup(apiSubscriptionP, "modifiedAt");
   if (modifiedAtNode == NULL)
   {
@@ -490,10 +486,7 @@ CachedSubscription* subCacheApiSubscriptionInsert
     subIdNodeP = kjLookup(apiSubscriptionP, "_id");  // FIXME: always "id" !!!
 
   if (subIdNodeP == NULL)
-  {
-    kjTreeLog(apiSubscriptionP, "apiSubscriptionP", LmtSubCacheSync);
     LM_X(1, ("Subscription without id - exiting due to bug"));
-  }
 
   char*               subId = subIdNodeP->value.s;
   CachedSubscription* subP  = subCacheItemLookup(tenant, subId);
