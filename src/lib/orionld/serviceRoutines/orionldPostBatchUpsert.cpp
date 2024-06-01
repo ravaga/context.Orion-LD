@@ -62,6 +62,7 @@ extern "C"
 #include "orionld/notifications/alteration.h"                  // alteration
 #include "orionld/serviceRoutines/orionldPostBatchUpsert.h"    // Own interface
 
+#include "orionld/notifications/previousValues.h"                // previousValues
 
 
 // ----------------------------------------------------------------------------
@@ -273,8 +274,11 @@ bool orionldPostBatchUpsert(void)
 
         finalDbEntityP = batchReplaceEntity(inEntityP, entityId, entityType, entityCreDate);
       }
-      else
+      else{
+        KjNode* dbAttrsP     = kjLookup(originalDbEntityP, "attrs");
+        previousValues(inEntityP, dbAttrsP);
         finalDbEntityP = batchUpdateEntity(inEntityP, originalDbEntityP, false);
+      }
 
       if (finalDbEntityP != NULL)
       {
