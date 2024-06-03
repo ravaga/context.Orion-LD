@@ -22,7 +22,6 @@
 *
 * Author: Ken Zangelin
 */
-#include <strings.h>                                           // bcopy
 #include <curl/curl.h>                                         // curl
 
 #include "logMsg/logMsg.h"                                     // LM_*
