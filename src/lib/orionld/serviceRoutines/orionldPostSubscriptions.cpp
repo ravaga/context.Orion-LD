@@ -176,6 +176,7 @@ SubordinateSubscription* subordinateCreate(CachedSubscription* cSubP, RegCacheIt
 
   cSubP->subordinateP          = subordinateP;
   LM_T(LmtSR, ("***************** Added subordinate subs to '%s' at %p", cSubP->subscriptionId, subordinateP));
+
   return subordinateP;
 }
 
@@ -418,10 +419,6 @@ bool orionldPostSubscriptions(void)
     // LM_T(LmtPernotLoop, ("pernotSubCache.newSubs == %d", pernotSubCache.newSubs));
   }
 
-  // dbModel
-  KjNode* dbSubscriptionP = subP;
-  subIdP->name = (char*) "_id";  // 'id' needs to be '_id' - mongo stuff ...
-  dbModelFromApiSubscription(dbSubscriptionP, false);
 
   //
   // Any subordinate subscriptions needed?
@@ -437,9 +434,36 @@ bool orionldPostSubscriptions(void)
       char* entityTypeP;
 
       if (regMatchSubscription(rciP, cSubP, &entityTypeP) == true)
-        subordinateCreate(cSubP, rciP, entityTypeP);
+      {
+        SubordinateSubscription* subSubP = subordinateCreate(cSubP, rciP, entityTypeP);
+
+        // Add the subordinate to subP
+        KjNode* subordinateP = kjLookup(subP, "subordinate");
+
+        if (subordinateP == NULL)
+        {
+          subordinateP = kjArray(orionldState.kjsonP, "subordinate");
+          kjChildAdd(subP, subordinateP);
+        }
+
+        KjNode* subSubNodeP = kjObject(orionldState.kjsonP,  NULL);  // No name - part of array
+        KjNode* subIdP      = kjString(orionldState.kjsonP,  "subscriptionId", subSubP->subscriptionId);
+        KjNode* regIdP      = kjString(orionldState.kjsonP,  "registrationId", subSubP->registrationId);
+        KjNode* runNoP      = kjInteger(orionldState.kjsonP, "runNo",          subSubP->runNo);
+
+        kjChildAdd(subSubNodeP, subIdP);
+        kjChildAdd(subSubNodeP, regIdP);
+        kjChildAdd(subSubNodeP, runNoP);
+
+        kjChildAdd(subordinateP, subSubNodeP);
+      }
     }
   }
+
+  // dbModel
+  KjNode* dbSubscriptionP = subP;
+  subIdP->name = (char*) "_id";  // 'id' needs to be '_id' - mongo stuff ...
+  dbModelFromApiSubscription(dbSubscriptionP, false);
 
   // sub to db - mongocSubscriptionInsert(subP);
   if (mongocSubscriptionInsert(dbSubscriptionP, subIdP->value.s) == false)

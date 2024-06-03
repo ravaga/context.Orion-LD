@@ -33,6 +33,7 @@ extern "C"
 
 #include "orionld/types/QNode.h"                                 // QNode
 #include "orionld/types/OrionldRenderFormat.h"                   // OrionldRenderFormat
+#include "orionld/types/SubordinateSubscription.h"               // SubordinateSubscription
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/numberToDate.h"                         // numberToDate
@@ -168,7 +169,13 @@ static bool notificationStatus(KjNode* dbLastSuccessP, KjNode* dbLastFailureP)
 //     }
 //   },
 //   "expiresAt": "2028-12-31T10:00:00",      => "expiresAt" => "expiration"
-//   "throttling": 5                          => SAME
+//   "throttling": 5,                         => SAME
+//   "subordinate": [
+//     {
+//       "registrationId": "urn:R1",
+//       "subscriptionId": "urn:ngsi-ld:Subscription:S1:1"
+//     }
+//   ]
 // }
 //
 KjNode* dbModelToApiSubscription
@@ -215,6 +222,7 @@ KjNode* dbModelToApiSubscription
   KjNode* dbCreatedAtP        = NULL;
   KjNode* dbModifiedAtP       = NULL;
   KjNode* timeIntervalNodeP   = kjLookup(dbSubP, "timeInterval");
+  KjNode* subordinateNodeP    = kjLookup(dbSubP, "subordinate");
 
   if ((orionldState.uriParamOptions.sysAttrs == true) || (forSubCache == true))
   {
@@ -693,6 +701,21 @@ KjNode* dbModelToApiSubscription
     dbLdContextP->name = (char*) "jsonldContext";
   }
 
+  //
+  //
+  if (subordinateNodeP != NULL)
+  {
+    kjChildRemove(dbSubP, subordinateNodeP);
+    kjChildAdd(apiSubP, subordinateNodeP);
+
+    for (KjNode* subordinateP = subordinateNodeP->value.firstChildP; subordinateP != NULL; subordinateP = subordinateP->next)
+    {
+      KjNode* runNoP = kjLookup(subordinateP, "runNo");
+
+      if (runNoP != NULL)
+        kjChildRemove(subordinateP, runNoP);
+    }
+  }
 
   if (qNodePP != NULL)  // FIXME: This is more than a bit weird ...
     *qNodePP = NULL;
