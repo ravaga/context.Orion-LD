@@ -109,6 +109,7 @@ size_t            hostHeaderLen;
 PernotSubCache    pernotSubCache;
 EntityMap*        entityMaps        = NULL;    // Used by GET /entities in the distributed case, for pagination
 bool              entityMapsEnabled = false;
+bool              distSubsEnabled   = false;
 
 
 

@@ -423,7 +423,7 @@ bool orionldPostSubscriptions(void)
   //
   // Any subordinate subscriptions needed?
   //
-  if (orionldState.uriParams.local == false)
+  if ((distSubsEnabled == true) && (orionldState.uriParams.local == false))
   {
     //
     // Find matching regs

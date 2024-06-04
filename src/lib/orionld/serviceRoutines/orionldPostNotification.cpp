@@ -33,8 +33,10 @@ extern "C"
 #include "cache/CachedSubscription.h"                          // CachedSubscription
 #include "cache/subCache.h"                                    // subCacheItemLookup
 
-#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/types/HttpKeyValue.h"                        // HttpKeyValue
+#include "orionld/types/OrionLdRestService.h"                  // OrionLdRestService
+#include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/http/httpRequest.h"                          // httpRequest
 #include "orionld/http/httpRequestHeaderAdd.h"                 // httpRequestHeaderAdd
 #include "orionld/serviceRoutines/orionldPostNotification.h"   // Own interface
@@ -49,7 +51,18 @@ bool orionldPostNotification(void)
 {
   char* parentSubId = orionldState.wildcard[0];
 
+  if (distSubsEnabled == false)
+  {
+    LM_W(("Got a notification on remote subscription subordinate to '%s', but, distributed subscriptions are not enabled", parentSubId));
+
+    orionldError(OrionldOperationNotSupported, "Distributed Subscriptions Are Not Enabled", orionldState.serviceP->url, 501);
+    orionldState.noLinkHeader   = true;  // We don't want the Link header for non-implemented requests
+
+    return true;
+  }
+
   LM_T(LmtSR, ("Got a notification on remote subscription subordinate to '%s'", parentSubId));
+
   kjTreeLog(orionldState.requestTree, "notification", LmtSR);
 
   CachedSubscription* cSubP = subCacheItemLookup(orionldState.tenantP->tenant, parentSubId);

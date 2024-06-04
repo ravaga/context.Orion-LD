@@ -507,7 +507,7 @@ KjNode* kjTreeFromCachedSubscription(CachedSubscription* cSubP, bool sysAttrs, b
   //
   // Subordinate subscriptions
   //
-  if (cSubP->subordinateP != NULL)
+  if ((distSubsEnabled == true) && (cSubP->subordinateP != NULL))
   {
     SubordinateSubscription* subordinateP = cSubP->subordinateP;
     KjNode*                  subSubArray  = kjArray(orionldState.kjsonP, "subordinate");
