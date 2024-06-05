@@ -60,6 +60,7 @@ extern "C"
 #include "orionld/mongoc/mongocEntitiesUpsert.h"               // mongocEntitiesUpsert
 #include "orionld/legacyDriver/legacyPostBatchUpsert.h"        // legacyPostBatchUpsert
 #include "orionld/notifications/alteration.h"                  // alteration
+#include "orionld/notifications/previousValues.h"              // previousValues
 #include "orionld/serviceRoutines/orionldPostBatchUpsert.h"    // Own interface
 
 
@@ -274,7 +275,12 @@ bool orionldPostBatchUpsert(void)
         finalDbEntityP = batchReplaceEntity(inEntityP, entityId, entityType, entityCreDate);
       }
       else
+      {
+        KjNode* dbAttrsP = kjLookup(originalDbEntityP, "attrs");
+
+        previousValues(inEntityP, dbAttrsP);
         finalDbEntityP = batchUpdateEntity(inEntityP, originalDbEntityP, false);
+      }
 
       if (finalDbEntityP != NULL)
       {

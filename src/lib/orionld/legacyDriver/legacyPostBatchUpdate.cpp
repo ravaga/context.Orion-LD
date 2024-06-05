@@ -56,6 +56,7 @@ extern "C"
 #include "orionld/common/typeCheckForNonExistingEntities.h"     // typeCheckForNonExistingEntities
 #include "orionld/common/duplicatedInstances.h"                 // duplicatedInstances
 #include "orionld/common/performance.h"                         // PERFORMANCE
+#include "orionld/notifications/previousValues.h"               // previousValues
 #include "orionld/service/orionldServiceInit.h"                 // orionldHostName, orionldHostNameLen
 #include "orionld/context/orionldCoreContext.h"                 // orionldDefaultUrl, orionldCoreContext
 #include "orionld/context/orionldContextPresent.h"              // orionldContextPresent
@@ -188,6 +189,8 @@ bool legacyPostBatchUpdate(void)
 
     // Not existing entities cannot be updated
     KjNode* dbEntityP = entityLookupById(idTypeAndCreDateFromDb, entityId);
+    KjNode* dbAttrsP  = (dbEntityP != NULL)? kjLookup(dbEntityP, "attrs") : NULL;
+
     if (dbEntityP == NULL)
     {
       entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "entity does not exist", NULL, 400);
@@ -206,6 +209,8 @@ bool legacyPostBatchUpdate(void)
       entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, orionldState.pd.title, orionldState.pd.detail, 400);
       kjChildRemove(incomingTree, entityP);
     }
+
+    previousValues(entityP, dbAttrsP);
 
     char* newType;
     if (entityTypeChange(entityP, dbEntityP, &newType) == true)
