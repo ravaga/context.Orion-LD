@@ -5,61 +5,42 @@ RUN ls /usr/local/lib/*.so*
 RUN echo "======================================================================"
 
 ARG PATH_TO_SRC='/opt/orion/'
+WORKDIR ${PATH_TO_SRC}
+
+
 ENV LD_LIBRARY_PATH=/opt/paho.mqtt.c/build/output:/usr/local/lib64:/opt/prometheus-client-c/prom/build:/opt/prometheus-client-c/promhttp/build:/usr/local/lib
-RUN echo LD_LIBRARY_PATH: $LD_LIBRARY_PATH
+# RUN echo LD_LIBRARY_PATH: $LD_LIBRARY_PATH
+COPY docker/mongo.repo /etc/yum.repos.d/mongo.repo
 
-RUN  wget https://downloads.sourceforge.net/ltp/lcov-1.14.tar.gz
-RUN tar -xf lcov-1.14.tar.gz
-WORKDIR lcov-1.14
-RUN make install
-WORKDIR ${PATH_TO_SRC}
+RUN  wget https://downloads.sourceforge.net/ltp/lcov-1.14.tar.gz && \
+     tar -xf lcov-1.14.tar.gz  && \
+     cd lcov-1.14 && \
+     make install && \
+     cd .. && \
+     yum install -y gnupg && \
+     yum install -y mongodb-database-tools mongodb-org-database-tools-extra \
+                 mongodb-org-tools mongodb-org-shell mongodb-org-server \
+                 mongodb-org-mongos mongodb-org && \
+     yum install -y python3 python2 virtualenv && \
+     ln --force -s /usr/bin/python2 /usr/bin/python && \
+     yum install -y openssl-devel libffi-devel netcat bc diffutils hostname procps gmock-devel gtest && \
+     wget https://bootstrap.pypa.io/pip/2.7/get-pip.py && \
+     python2.7 get-pip.py && \
+     pip2.7 install Flask && \
+     pip2.7 install paho-mqtt && \
+     pip2.7 install pyopenssl && \
+     wget https://src.fedoraproject.org/repo/pkgs/gmock/gmock-1.5.0.tar.bz2/d738cfee341ad10ce0d7a0cc4209dd5e/gmock-1.5.0.tar.bz2 && \
+     tar xfvj gmock-1.5.0.tar.bz2 && \
+     cd gmock-1.5.0 && \
+     ./configure && \
+     make && \ 
+     make install && \
+     cd .. && \
+     yum clean all && \
+     rm lcov-1.14.tar.gz gmock-1.5.0.tar.bz2 
 
-RUN yum-config-manager --disable pgdg-common
-
-## Workaround to refresh the repo key that was baked into the base image
-RUN yum --nogpgcheck --disablerepo=* -y install https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm ; exit 0
-RUN mv /etc/yum.repos.d/pgdg-redhat-all.repo.rpmnew /etc/yum.repos.d/pgdg-redhat-all.repo ; exit 0
-RUN yum --nogpgcheck -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-
-RUN yum install --nogpgcheck -y gnupg
-
-RUN yum install --nogpgcheck -y https://repo.mongodb.org/yum/redhat/8Server/mongodb-org/4.4/x86_64/RPMS/mongodb-database-tools-100.4.1.x86_64.rpm
-RUN yum install --nogpgcheck -y https://repo.mongodb.org/yum/redhat/8Server/mongodb-org/4.4/x86_64/RPMS/mongodb-org-database-tools-extra-4.4.9-1.el8.x86_64.rpm
-RUN yum install --nogpgcheck -y https://repo.mongodb.org/yum/redhat/8Server/mongodb-org/4.4/x86_64/RPMS/mongodb-org-tools-4.4.9-1.el8.x86_64.rpm
-RUN yum install --nogpgcheck -y https://repo.mongodb.org/yum/redhat/8Server/mongodb-org/4.4/x86_64/RPMS/mongodb-org-shell-4.4.9-1.el8.x86_64.rpm
-RUN yum install --nogpgcheck -y https://repo.mongodb.org/yum/redhat/8Server/mongodb-org/4.4/x86_64/RPMS/mongodb-org-server-4.4.9-1.el8.x86_64.rpm
-RUN yum install --nogpgcheck -y https://repo.mongodb.org/yum/redhat/8Server/mongodb-org/4.4/x86_64/RPMS/mongodb-org-mongos-4.4.9-1.el8.x86_64.rpm
-RUN yum install --nogpgcheck -y https://repo.mongodb.org/yum/redhat/8Server/mongodb-org/4.4/x86_64/RPMS/mongodb-org-4.4.9-1.el8.x86_64.rpm
-RUN yum install --nogpgcheck -y mongodb-org
-
-RUN yum install --nogpgcheck -y python3 python2 virtualenv
-RUN ln --force -s /usr/bin/python2 /usr/bin/python
-
-RUN yum install --nogpgcheck -y openssl-devel libffi-devel
-
-RUN wget https://bootstrap.pypa.io/pip/2.7/get-pip.py
-RUN python2.7 get-pip.py
-RUN pip2.7 install Flask
-RUN pip2.7 install paho-mqtt
-RUN pip2.7 install pyopenssl
-
-# RUN yum --nogpgcheck -y install https://rpmfind.net/linux/centos/8-stream/PowerTools/x86_64/os/Packages/gtest-1.8.0-5.el8.x86_64.rpm
-# RUN yum --nogpgcheck -y install https://rpmfind.net/linux/centos/8-stream/PowerTools/x86_64/os/Packages/gmock-1.8.0-5.el8.x86_64.rpm
-# RUN yum --nogpgcheck -y install https://rpmfind.net/linux/centos/8-stream/PowerTools/x86_64/os/Packages/gmock-devel-1.8.0-5.el8.x86_64.rpm
-RUN yum --nogpgcheck -y install procps gmock-devel gtest
-
-RUN wget https://src.fedoraproject.org/repo/pkgs/gmock/gmock-1.5.0.tar.bz2/d738cfee341ad10ce0d7a0cc4209dd5e/gmock-1.5.0.tar.bz2
-RUN tar xfvj gmock-1.5.0.tar.bz2
-WORKDIR gmock-1.5.0
-RUN ./configure
-RUN make
-RUN make install
-WORKDIR ${PATH_TO_SRC}
-
-RUN yum install --nogpgcheck -y netcat bc diffutils hostname
 
 COPY . ${PATH_TO_SRC}
 WORKDIR ${PATH_TO_SRC}
-
 
 ENTRYPOINT ["docker/build.sh"]

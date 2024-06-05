@@ -2,12 +2,15 @@ FROM fiware/orion-ld-base
 
 ARG PATH_TO_SRC='opt/orion/'
 
-RUN cp -a /usr/local/lib/. /usr/lib/x86_64-linux-gnu/
-RUN rm -r /usr/local/lib/
+RUN yum -y install hostname && \
+    cp -a /usr/local/lib/. /usr/lib/x86_64-linux-gnu/ && \
+    rm -r /usr/local/lib/
 
 COPY . ${PATH_TO_SRC}
 
 WORKDIR ${PATH_TO_SRC}
+
+ENV PKG_CONFIG_PATH=/usr/local/lib64/pkgconfig:/usr/local/lib/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig
 
 RUN make debug install
 
