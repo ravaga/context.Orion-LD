@@ -188,7 +188,7 @@ bool legacyPostBatchUpdate(void)
 
     // Not existing entities cannot be updated
     KjNode* dbEntityP = entityLookupById(idTypeAndCreDateFromDb, entityId);
-    KjNode* dbAttrsP         = (dbEntityP != NULL)? kjLookup(dbEntityP, "attrs") : NULL;
+    KjNode* dbAttrsP  = (dbEntityP != NULL)? kjLookup(dbEntityP, "attrs") : NULL;
 
     if (dbEntityP == NULL)
     {
