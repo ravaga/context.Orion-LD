@@ -32,9 +32,7 @@ RUN yum install --nogpgcheck -y https://repo.mongodb.org/yum/redhat/8Server/mong
 RUN yum install --nogpgcheck -y https://repo.mongodb.org/yum/redhat/8Server/mongodb-org/4.4/x86_64/RPMS/mongodb-org-4.4.9-1.el8.x86_64.rpm
 RUN yum install --nogpgcheck -y mongodb-org
 
-RUN yum install --nogpgcheck -y python3
-RUN yum install --nogpgcheck -y virtualenv
-RUN yum install --nogpgcheck -y python2
+RUN yum install --nogpgcheck -y python3 python2 virtualenv
 RUN ln --force -s /usr/bin/python2 /usr/bin/python
 
 RUN yum install --nogpgcheck -y openssl-devel libffi-devel
@@ -45,10 +43,10 @@ RUN pip2.7 install Flask
 RUN pip2.7 install paho-mqtt
 RUN pip2.7 install pyopenssl
 
-RUN yum --nogpgcheck -y install https://rpmfind.net/linux/centos/8-stream/PowerTools/x86_64/os/Packages/gtest-1.8.0-5.el8.x86_64.rpm
-RUN yum --nogpgcheck -y install https://rpmfind.net/linux/centos/8-stream/PowerTools/x86_64/os/Packages/gmock-1.8.0-5.el8.x86_64.rpm
-RUN yum --nogpgcheck -y install https://rpmfind.net/linux/centos/8-stream/PowerTools/x86_64/os/Packages/gmock-devel-1.8.0-5.el8.x86_64.rpm
-RUN yum --nogpgcheck -y install procps
+# RUN yum --nogpgcheck -y install https://rpmfind.net/linux/centos/8-stream/PowerTools/x86_64/os/Packages/gtest-1.8.0-5.el8.x86_64.rpm
+# RUN yum --nogpgcheck -y install https://rpmfind.net/linux/centos/8-stream/PowerTools/x86_64/os/Packages/gmock-1.8.0-5.el8.x86_64.rpm
+# RUN yum --nogpgcheck -y install https://rpmfind.net/linux/centos/8-stream/PowerTools/x86_64/os/Packages/gmock-devel-1.8.0-5.el8.x86_64.rpm
+RUN yum --nogpgcheck -y install procps gmock-devel gtest
 
 RUN wget https://src.fedoraproject.org/repo/pkgs/gmock/gmock-1.5.0.tar.bz2/d738cfee341ad10ce0d7a0cc4209dd5e/gmock-1.5.0.tar.bz2
 RUN tar xfvj gmock-1.5.0.tar.bz2
@@ -58,10 +56,7 @@ RUN make
 RUN make install
 WORKDIR ${PATH_TO_SRC}
 
-RUN yum install --nogpgcheck -y netcat
-RUN yum install --nogpgcheck -y bc
-RUN yum install --nogpgcheck -y diffutils
-RUN yum install --nogpgcheck -y hostname
+RUN yum install --nogpgcheck -y netcat bc diffutils hostname
 
 COPY . ${PATH_TO_SRC}
 WORKDIR ${PATH_TO_SRC}
