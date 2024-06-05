@@ -56,6 +56,7 @@ extern "C"
 #include "orionld/common/typeCheckForNonExistingEntities.h"     // typeCheckForNonExistingEntities
 #include "orionld/common/duplicatedInstances.h"                 // duplicatedInstances
 #include "orionld/common/performance.h"                         // PERFORMANCE
+#include "orionld/notifications/previousValues.h"               // previousValues
 #include "orionld/service/orionldServiceInit.h"                 // orionldHostName, orionldHostNameLen
 #include "orionld/context/orionldCoreContext.h"                 // orionldDefaultUrl, orionldCoreContext
 #include "orionld/context/orionldContextPresent.h"              // orionldContextPresent
