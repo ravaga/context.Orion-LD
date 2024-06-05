@@ -142,7 +142,7 @@ payload='{
       "accept": "application/json"
     }
   },
-  "expiresAt": "2024-06-01T10:00:00.123Z",
+  "expiresAt": "2034-06-01T10:00:00.123Z",
   "throttling": 5.5,
   "lang": "es"
 }'
@@ -363,7 +363,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="h
             "type": "T"
         }
     ],
-    "expiresAt": "2024-06-01T10:00:00.123Z",
+    "expiresAt": "2034-06-01T10:00:00.123Z",
     "geoQ": {
         "coordinates": "5,5",
         "geometry": "Point",
@@ -438,7 +438,7 @@ MongoDB server version: REGEX(.*)
 	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
 	"ldQ" : "https://uri=etsi=org/ngsi-ld/default-context/a.value>12",
 	"name" : "New name",
-	"expiration" : 1717236000.123
+	"expiration" : 2032768800.123
 }
 bye
 
@@ -464,7 +464,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="h
             "type": "T"
         }
     ],
-    "expiresAt": "2024-06-01T10:00:00.123Z",
+    "expiresAt": "2034-06-01T10:00:00.123Z",
     "geoQ": {
         "coordinates": [
             5,

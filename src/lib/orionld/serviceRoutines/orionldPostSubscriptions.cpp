@@ -39,11 +39,15 @@ extern "C"
 #include "orionld/types/QNode.h"                               // QNode
 #include "orionld/types/PernotSubscription.h"                  // PernotSubscription
 #include "orionld/types/PernotSubCache.h"                      // PernotSubCache
+#include "orionld/types/RegCache.h"                            // RegCache
+#include "orionld/types/RegCacheItem.h"                        // RegCacheItem
+#include "orionld/types/SubordinateSubscription.h"             // SubordinateSubscription
 #include "orionld/common/orionldState.h"                       // orionldState, coreContextUrl
 #include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/uuidGenerate.h"                       // uuidGenerate
 #include "orionld/common/subCacheApiSubscriptionInsert.h"      // subCacheApiSubscriptionInsert
 #include "orionld/http/httpHeaderLocationAdd.h"                // httpHeaderLocationAdd
+#include "orionld/http/httpRequestHeaderAdd.h"                 // httpRequestHeaderAdd
 #include "orionld/legacyDriver/legacyPostSubscriptions.h"      // legacyPostSubscriptions
 #include "orionld/kjTree/kjChildPrepend.h"                     // kjChildPrepend
 #include "orionld/dbModel/dbModelFromApiSubscription.h"        // dbModelFromApiSubscription
@@ -60,7 +64,121 @@ extern "C"
 #include "orionld/q/qAliasCompact.h"                           // qAliasCompact
 #include "orionld/q/qPresent.h"                                // qPresent
 #include "orionld/payloadCheck/pCheckSubscription.h"           // pCheckSubscription
+#include "orionld/http/httpRequest.h"                          // httpRequest
+#include "orionld/common/tenantList.h"                         // tenant0
+#include "orionld/regMatch/regMatchSubscription.h"             // regMatchSubscription
 #include "orionld/serviceRoutines/orionldPostSubscriptions.h"  // Own Interface
+
+
+
+// -----------------------------------------------------------------------------
+//
+// subordinateCreate - create a subordinate subscription on another endpoint
+//
+// {
+//   "id": "cSubP->subId:000x",
+//   "type": "Subscription",
+//   "entities": [
+//     {
+//       "type": "xxx"
+//     }
+//   ],
+//   "notification": {
+//     "endpoint": {
+//       "uri": <main subscription broker IP:port + "/ngsi-ld/v1/notifications/$MAIN_SUBSCRIPTION_ID">
+//     }
+//   }
+// }
+//
+SubordinateSubscription* subordinateCreate(CachedSubscription* cSubP, RegCacheItem* rciP, const char* entityType)
+{
+  LM_T(LmtSR, ("Creating a subscription subordinate to '%s' on '%s'", cSubP->subscriptionId, rciP->regId));
+
+  int  runNo = 1;
+
+  for (SubordinateSubscription* subordinateP = cSubP->subordinateP; subordinateP != NULL; subordinateP = subordinateP->next)
+  {
+    runNo = MAX(runNo, subordinateP->runNo);
+  }
+
+  char subSubId[128];
+  snprintf(subSubId, sizeof(subSubId), "%s:%d", cSubP->subscriptionId, runNo);
+
+  char notificationUrl[256];
+  snprintf(notificationUrl, sizeof(notificationUrl), "http://%s/ngsi-ld/ex/v1/notifications/%s", localIpAndPort, cSubP->subscriptionId);
+
+  KjNode* bodyP         = kjObject(orionldState.kjsonP, NULL);
+  KjNode* idP           = kjString(orionldState.kjsonP, "id", subSubId);
+  KjNode* typeP         = kjString(orionldState.kjsonP, "type", "Subscription");
+  KjNode* entitiesP     = kjArray(orionldState.kjsonP, "entities");
+  KjNode* entityP       = kjObject(orionldState.kjsonP, NULL);
+  KjNode* entityTypeP   = kjString(orionldState.kjsonP, "type", entityType);
+  KjNode* notificationP = kjObject(orionldState.kjsonP, "notification");
+  KjNode* endpointP     = kjObject(orionldState.kjsonP, "endpoint");
+  KjNode* urlP          = kjString(orionldState.kjsonP, "uri", notificationUrl);
+
+  kjChildAdd(bodyP, idP);
+  kjChildAdd(bodyP, typeP);
+  kjChildAdd(bodyP, entitiesP);
+  kjChildAdd(bodyP, notificationP);
+
+  kjChildAdd(entitiesP, entityP);
+  kjChildAdd(entityP, entityTypeP);
+
+  kjChildAdd(notificationP, endpointP);
+  kjChildAdd(endpointP, urlP);
+
+  kjTreeLog(bodyP, "Subordinate subscription", LmtSR);
+
+  HttpKeyValue  headers[3];
+  int           headerIx = 0;
+
+  bzero(&headers, sizeof(headers));
+
+  if (orionldState.tenantP != &tenant0)
+    httpRequestHeaderAdd(&headers[headerIx++], "NGSILD-Tenant", orionldState.tenantP->tenant, 0);
+
+  KjNode*                responseBody = NULL;
+  int                    tmo          = 5000;
+  OrionldProblemDetails  pd;
+  char                   rciIp[128];
+  char                   rciUrl[512];
+  char*                  colon = strchr(rciP->ipAndPort, ':');
+
+  if (colon != NULL)
+    *colon = 0;
+  strncpy(rciIp, rciP->ipAndPort, sizeof(rciIp) - 1);
+  if (colon != NULL)
+    *colon = ':';
+
+  LM_T(LmtSR, ("IP of registration: '%s'", rciIp));
+  snprintf(rciUrl, sizeof(rciUrl) - 1, "http://%s/ngsi-ld/v1/subscriptions", rciP->ipAndPort);
+
+  httpRequestHeaderAdd(&headers[headerIx++], "Content-Type", "application/json", 0);
+  int httpStatus = httpRequest(rciIp, "POST", rciUrl, bodyP, NULL, headers, tmo, &responseBody, &pd);
+  if (httpStatus != 201)
+  {
+    LM_W(("Attempt to create subordinate subscription failed with a %d", httpStatus));
+    return NULL;
+  }
+
+  SubordinateSubscription* subordinateP = (SubordinateSubscription*) calloc(1, sizeof(SubordinateSubscription));
+  if (subordinateP == NULL)
+    LM_X(1, ("Out of memory allocating a subordinate subscription"));
+
+  subordinateP->subscriptionId = strdup(subSubId);
+  if (subordinateP->subscriptionId == NULL)
+    LM_X(1, ("Out of memory allocating the id of a subordinate subscription"));
+
+  subordinateP->registrationId = rciP->regId;
+  subordinateP->runNo          = runNo;
+  subordinateP->next           = cSubP->subordinateP;
+
+  cSubP->subordinateP          = subordinateP;
+  LM_T(LmtSR, ("***************** Added subordinate subs to '%s' at %p", cSubP->subscriptionId, subordinateP));
+
+  return subordinateP;
+}
 
 
 
@@ -299,6 +417,47 @@ bool orionldPostSubscriptions(void)
     // Signal that there's a new Pernot subscription in the cache
     // ++pernotSubCache.newSubs;
     // LM_T(LmtPernotLoop, ("pernotSubCache.newSubs == %d", pernotSubCache.newSubs));
+  }
+
+
+  //
+  // Any subordinate subscriptions needed?
+  //
+  if ((distSubsEnabled == true) && (orionldState.uriParams.local == false))
+  {
+    //
+    // Find matching regs
+    // Create a subordinate subscription in brokers behind matching regs, if "subCreate" is in "operations"
+    //
+    for (RegCacheItem* rciP = orionldState.tenantP->regCache->regList; rciP != NULL; rciP = rciP->next)
+    {
+      char* entityTypeP;
+
+      if (regMatchSubscription(rciP, cSubP, &entityTypeP) == true)
+      {
+        SubordinateSubscription* subSubP = subordinateCreate(cSubP, rciP, entityTypeP);
+
+        // Add the subordinate to subP
+        KjNode* subordinateP = kjLookup(subP, "subordinate");
+
+        if (subordinateP == NULL)
+        {
+          subordinateP = kjArray(orionldState.kjsonP, "subordinate");
+          kjChildAdd(subP, subordinateP);
+        }
+
+        KjNode* subSubNodeP = kjObject(orionldState.kjsonP,  NULL);  // No name - part of array
+        KjNode* subIdP      = kjString(orionldState.kjsonP,  "subscriptionId", subSubP->subscriptionId);
+        KjNode* regIdP      = kjString(orionldState.kjsonP,  "registrationId", subSubP->registrationId);
+        KjNode* runNoP      = kjInteger(orionldState.kjsonP, "runNo",          subSubP->runNo);
+
+        kjChildAdd(subSubNodeP, subIdP);
+        kjChildAdd(subSubNodeP, regIdP);
+        kjChildAdd(subSubNodeP, runNoP);
+
+        kjChildAdd(subordinateP, subSubNodeP);
+      }
+    }
   }
 
   // dbModel

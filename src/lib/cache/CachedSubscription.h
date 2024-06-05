@@ -38,6 +38,7 @@
 #include "orionld/types/OrionldAlteration.h"                 // OrionldAlterationTypes
 #include "orionld/types/OrionldTenant.h"                     // OrionldTenant
 #include "orionld/types/OrionldContext.h"                    // OrionldContext
+#include "orionld/types/SubordinateSubscription.h"           // SubordinateSubscription
 
 
 
@@ -131,6 +132,8 @@ struct CachedSubscription
 
   double                      createdAt;
   double                      modifiedAt;
+
+  SubordinateSubscription*    subordinateP;          // Linked list of subordinate subscriptions
 
   struct CachedSubscription*  next;
   bool                        inDB;                  // Used by mongocSubCachePopulateByTenant to find subs that have been removed

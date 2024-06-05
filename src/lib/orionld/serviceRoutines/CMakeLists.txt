@@ -66,6 +66,7 @@ SET (SOURCES
     orionldPostContexts.cpp
     orionldDeleteContext.cpp
     orionldPostNotify.cpp
+    orionldPostNotification.cpp
     orionldGetPing.cpp
     orionldPatchEntity2.cpp
     orionldOptions.cpp
