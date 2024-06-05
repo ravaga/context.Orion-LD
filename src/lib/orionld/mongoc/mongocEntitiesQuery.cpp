@@ -777,6 +777,18 @@ KjNode* mongocEntitiesQuery
   {
     if (geoFilter(&mongoFilter, geoInfoP) == false)
       return NULL;
+
+    //
+    // NOTE
+    //   Counting doesn't work with $near|$nearSphere
+    //   Must cancel the count in case it's requested, if it's a geo query with $near
+    //
+    if ((geoInfoP->georel == GeorelNear) && (countP != NULL))
+    {
+      LM_W(("Cannot count entities if georel is 'near'. MongoDB doesn't allow it"));
+      *countP = -2;    // Mark the 'absense' of a count
+      countP  = NULL;  // This inhibits the count
+    }
   }
 
   bson_append_document(&options, "projection", 10, &projection);
