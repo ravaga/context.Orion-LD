@@ -612,7 +612,8 @@ extern bool              noCache;                  // From orionld.cpp
 extern uint32_t          cSubCounters;             // Number of subscription counter updates before flush from sub-cache to DB
 extern PernotSubCache    pernotSubCache;
 extern EntityMap*        entityMaps;               // Used by GET /entities in the distributed case, for pagination
-extern bool              entityMapsEnabled;
+extern bool              entityMapsEnabled;        // Enable Entity Maps
+extern bool              distSubsEnabled;          // Enable distributed subscriptions
 extern bool              noArrayReduction;         // Used by arrayReduce in pCheckAttribute.cpp
 
 extern char                localIpAndPort[135];    // Local address for X-Forwarded-For (from orionld.cpp)

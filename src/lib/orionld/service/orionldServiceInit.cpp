@@ -80,6 +80,7 @@
 #include "orionld/serviceRoutines/orionldPostContexts.h"             // orionldPostContexts
 #include "orionld/serviceRoutines/orionldDeleteContext.h"            // orionldDeleteContext
 #include "orionld/serviceRoutines/orionldPostNotify.h"               // orionldPostNotify
+#include "orionld/serviceRoutines/orionldPostNotification.h"         // orionldPostNotification
 
 #include "orionld/serviceRoutines/orionldGetTemporalEntities.h"              // orionldGetTemporalEntities
 #include "orionld/serviceRoutines/orionldGetTemporalEntity.h"                // orionldGetTemporalEntity
@@ -211,6 +212,10 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->options   |= ORIONLD_SERVICE_OPTION_DATASET_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldPostNotify)
+  {
+    serviceP->uriParams |= ORIONLD_URIPARAM_SUBSCRIPTION_ID;
+  }
+  else if (serviceP->serviceRoutine == orionldPostNotification)
   {
     serviceP->uriParams |= ORIONLD_URIPARAM_SUBSCRIPTION_ID;
   }

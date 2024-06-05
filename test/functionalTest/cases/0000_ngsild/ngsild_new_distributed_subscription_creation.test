@@ -1,0 +1,351 @@
+# Copyright 2024 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Distributed Subscriptions - creation and deletion
+
+--SHELL-INIT--
+dbInit CB
+dbInit CP1
+orionldStart CB -experimental -wip distSubs
+orionldStart CP1 -experimental
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
+
+--SHELL--
+
+#
+# 01. Create a registration R1 on CB, on entity type T, with endpoint CP1
+# 02. Create a subscription S1 on CB, on entity type T - forwarded to CP1
+# 03. Query CP1 for its subscriptions - see the CB::S1 subordinate subscription
+# 04. Create an entity matching the subscription in CP1 - get notification in CB and then acc
+# 05. Dump the accumulator to see the notification
+# 06. GET the subscription, see the subordinate subscription
+# 07. See the subscription in mongo
+# 08. GET the subscription from DB, see the subordinate subscription
+#
+
+echo "01. Create a registration R1 on CB, on entity type T, with endpoint CP1"
+echo "======================================================================="
+payload='{
+  "id": "urn:R1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "T"
+        }
+      ]
+    }
+  ],
+  "endpoint": "localhost:'$CP1_PORT'",
+  "operations": [ "createEntity", "retrieveEntity", "mergeEntity", "createSubscription" ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "02. Create a subscription S1 on CB, on entity type T - forwarded to CP1"
+echo "======================================================================="
+payload='{
+  "id": "urn:ngsi-ld:Subscription:S1",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "T"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://localhost:'$LISTENER_PORT'/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. Query CP1 for its subscriptions - see the CB::S1 subordinate subscription"
+echo "============================================================================="
+orionCurl --url /ngsi-ld/v1/subscriptions --port $CP1_PORT
+echo
+echo
+
+
+echo "04. Create an entity matching the subscription in CP1 - get notification in CB and then acc"
+echo "==========================================================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": 1
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "05. Dump the accumulator to see the notification"
+echo "================================================"
+accumulatorDump
+echo
+echo
+
+
+echo "06. GET the subscription, see the subordinate subscription"
+echo "=========================================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:S1
+echo
+echo
+
+
+echo "07. See the subscription in mongo"
+echo "================================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "08. GET the subscription from DB, see the subordinate subscription"
+echo "=================================================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:S1?options=fromDb
+echo
+echo
+
+
+
+--REGEXPECT--
+01. Create a registration R1 on CB, on entity type T, with endpoint CP1
+=======================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R1
+
+
+
+02. Create a subscription S1 on CB, on entity type T - forwarded to CP1
+=======================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:S1
+
+
+
+03. Query CP1 for its subscriptions - see the CB::S1 subordinate subscription
+=============================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+[
+    {
+        "entities": [
+            {
+                "type": "T"
+            }
+        ],
+        "id": "urn:ngsi-ld:Subscription:S1:1",
+        "isActive": true,
+        "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)",
+        "notification": {
+            "endpoint": {
+                "accept": "application/json",
+                "uri": "http://REGEX(.*)/ngsi-ld/ex/v1/notifications/urn:ngsi-ld:Subscription:S1"
+            },
+            "format": "normalized",
+            "status": "ok"
+        },
+        "origin": "cache",
+        "status": "active",
+        "type": "Subscription"
+    }
+]
+
+
+04. Create an entity matching the subscription in CP1 - get notification in CB and then acc
+===========================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+05. Dump the accumulator to see the notification
+================================================
+POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:Subscription:S1
+Content-Length: 250
+Host: REGEX(.*)
+Accept: */*
+Content-Type: application/json
+
+{
+    "data": [
+        {
+            "P1": {
+                "type": "Property",
+                "value": 1
+            },
+            "id": "urn:E1",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)Z",
+    "subscriptionId": "urn:ngsi-ld:Subscription:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+06. GET the subscription, see the subordinate subscription
+==========================================================
+HTTP/1.1 200 OK
+Content-Length: 442
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+{
+    "entities": [
+        {
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Subscription:S1",
+    "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)",
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "http://localhost:9997/notify"
+        },
+        "format": "normalized",
+        "status": "ok"
+    },
+    "origin": "cache",
+    "status": "active",
+    "subordinate": [
+        {
+            "registrationId": "urn:R1",
+            "subscriptionId": "urn:ngsi-ld:Subscription:S1:1"
+        }
+    ],
+    "type": "Subscription"
+}
+
+
+07. See the subscription in mongo
+=================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:Subscription:S1",
+	"entities" : [
+		{
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+			"id" : ".*",
+			"isPattern" : "true",
+			"isTypePattern" : false
+		}
+	],
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"subordinate" : [
+		{
+			"subscriptionId" : "urn:ngsi-ld:Subscription:S1:1",
+			"registrationId" : "urn:R1",
+			"runNo" : 1
+		}
+	],
+	"throttling" : 0,
+	"expression" : {
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : "",
+		"q" : "",
+		"mq" : ""
+	},
+	"reference" : "http://REGEX(.*)/notify",
+	"mimeType" : "application/json",
+	"attrs" : [ ],
+	"format" : "normalized",
+	"conditions" : [ ],
+	"status" : "active",
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)"
+}
+bye
+
+
+08. GET the subscription from DB, see the subordinate subscription
+==================================================================
+HTTP/1.1 200 OK
+Content-Length: 445
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+{
+    "entities": [
+        {
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Subscription:S1",
+    "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "http://localhost:9997/notify"
+        },
+        "format": "normalized",
+        "status": "ok"
+    },
+    "origin": "database",
+    "status": "active",
+    "subordinate": [
+        {
+            "registrationId": "urn:R1",
+            "subscriptionId": "urn:ngsi-ld:Subscription:S1:1"
+        }
+    ],
+    "type": "Subscription"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+accumulatorStop
+dbDrop CB
+dbDrop CP1

@@ -23,6 +23,8 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
 SET (SOURCES
     httpHeaderLocationAdd.cpp
     httpHeaderLinkAdd.cpp
+    httpRequest.cpp
+    httpRequestHeaderAdd.cpp
 )
 
 # Include directories
