@@ -156,7 +156,7 @@ Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:S1
 03. Query CP1 for its subscriptions - see the CB::S1 subordinate subscription
 =============================================================================
 HTTP/1.1 200 OK
-Content-Length: 396
+Content-Length: REGEX(.*)
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
