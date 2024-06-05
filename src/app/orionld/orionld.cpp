@@ -75,6 +75,7 @@
 extern "C"
 {
 #include "kbase/kInit.h"                                    // kInit
+#include "kbase/kStringSplit.h"                             // kStringSplit
 #include "kalloc/kaInit.h"                                  // kaInit
 #include "kalloc/kaBufferInit.h"                            // kaBufferInit
 #include "kalloc/kaBufferReset.h"                           // kaBufferReset
@@ -321,7 +322,7 @@ bool            noArrayReduction = false;
 #define SOCKET_SERVICE_PORT_DESC  "port to receive new socket service connections"
 #define DISTRIBUTED_DESC       "turn on distributed operation"
 #define BROKER_ID_DESC         "identity of this broker instance for registrations - for the Via header"
-#define WIP_DESC               "Enable concepts that are 'Work In Progress' (e.g. -wip entityMaps)"
+#define WIP_DESC               "Enable concepts that are 'Work In Progress' (e.g. -wip entityMaps,distSubs)"
 #define FORWARDING_DESC        "turn on distributed operation (deprecated)"
 #define ID_INDEX_DESC          "automatic mongo index on _id.id"
 #define NOSWAP_DESC            "no swapping - for testing only!!!"
@@ -1062,8 +1063,18 @@ int main(int argC, char* argV[])
 
   if (wip[0] != 0)
   {
-    if (strcmp(wip, "entityMaps") == 0)
-      entityMapsEnabled = true;
+    char* wipV[3];
+    int   wips = kStringSplit(wip, ',', wipV, 3);
+
+    for (int ix = 0; ix < wips; ix++)
+    {
+      if (strcmp(wipV[ix], "entityMaps") == 0)
+        entityMapsEnabled = true;
+      else if (strcmp(wipV[ix], "distSubs") == 0)
+        distSubsEnabled = true;
+      else
+        LM_X(1, ("Invalid value for -wip comma-separated list (allowed: 'entityMaps', 'distSubs')"));
+    }
   }
 
 #if 0
@@ -1348,27 +1359,29 @@ int main(int argC, char* argV[])
 
   LM_K(("Initialization is Done"));
   LM_K(("  Accepting REST requests on port %d (experimental API endpoints are %sabled)", port, (experimental == true)? "en" : "dis"));
-  LM_K(("  TRoE:                    %s", (troe          == true)? "Enabled" : "Disabled"));
-  LM_K(("  Distributed Operation:   %s", (distributed   == true)? "Enabled" : "Disabled"));
-  LM_K(("  Health Check:            %s", (socketService == true)? "Enabled" : "Disabled"));
+  LM_K(("  TRoE:                      %s", (troe               == true)? "Enabled" : "Disabled"));
+  LM_K(("  Distributed Operation:     %s", (distributed        == true)? "Enabled" : "Disabled"));
+  LM_K(("  Health Check:              %s", (socketService      == true)? "Enabled" : "Disabled"));
+  LM_K(("  Entity Maps:               %s", (entityMapsEnabled  == true)? "Enabled" : "Disabled"));
+  LM_K(("  Distributed Subscriptions: %s", (distSubsEnabled    == true)? "Enabled" : "Disabled"));
 
   if (troe)
-    LM_K(("  Postgres Server Version: %s", postgresServerVersion));
+    LM_K(("  Postgres Server Version:   %s", postgresServerVersion));
 
-  LM_K(("  Mongo Server Version:    %s", mongocServerVersion));
+  LM_K(("  Mongo Server Version:      %s", mongocServerVersion));
 
   if (mongocOnly == true)
   {
-    LM_K(("  Mongo Driver:            mongoc driver- ONLY (MongoDB C++ Legacy Driver is DISABLED)"));
-    LM_K(("  MongoC Driver Version:   %s", MONGOC_VERSION_S));
+    LM_K(("  Mongo Driver:              mongoc driver- ONLY (MongoDB C++ Legacy Driver is DISABLED)"));
+    LM_K(("  MongoC Driver Version:     %s", MONGOC_VERSION_S));
   }
   else if (experimental  == true)
   {
-    LM_K(("  Mongo Driver:            mongoc driver for NGSI-LD requests, Legacy Mongo C++ Driver for NGSIv1&2"));
-    LM_K(("  MongoC Driver Version:   %s", MONGOC_VERSION_S));
+    LM_K(("  Mongo Driver:              mongoc driver for NGSI-LD requests, Legacy Mongo C++ Driver for NGSIv1&2"));
+    LM_K(("  MongoC Driver Version:     %s", MONGOC_VERSION_S));
   }
   else
-    LM_K(("  Mongo Driver:            Legacy C++ Driver (deprecated by mongodb)"));
+    LM_K(("  Mongo Driver:              Legacy C++ Driver (deprecated by mongodb)"));
 
   // Startup is done - we can free up the allocated kalloc buffers - assuming socketService doesn't use kalloc ...
   kaBufferReset(&orionldState.kalloc, KFALSE);

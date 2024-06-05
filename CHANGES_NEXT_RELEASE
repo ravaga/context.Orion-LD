@@ -18,7 +18,8 @@
   * Support for attributes of type JsonProperty
   * Support for the new URL parameter "format" for output formats (normalized, concise, simplified)
   * New service: DELETE /ngsi-ld/v1/entities  (URL param 'type' only - the rest are missing still)
-  
+  * Distributed Subscriptions  
+
 ## Notes
   * TRoE is still not prepared for attributes of type Vocab/Json/Language, so, attributes of those types are not stored in the historical database
   * Modified the @context hosting feature to be according to API spec

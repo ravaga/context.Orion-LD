@@ -85,6 +85,7 @@ typedef enum TraceLevels
   LmtDistOpResponseDetail,             // Details on responses to distributed requests
   LmtDistOpResponseHeaders,            // HTTP headers of responses to distributed requests
   LmtRegMatch,                         // Distributed Operations: registration matching
+  LmtDistOpSubMatch,                   // Matching subscriptions with registrations
 
   //
   // Distributed Operations - misc

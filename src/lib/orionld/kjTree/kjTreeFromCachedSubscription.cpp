@@ -37,6 +37,7 @@ extern "C"
 
 #include "cache/subCache.h"                                      // CachedSubscription
 
+#include "orionld/types/SubordinateSubscription.h"               // SubordinateSubscription
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/common/eqForDot.h"                             // eqForDot
@@ -501,6 +502,30 @@ KjNode* kjTreeFromCachedSubscription(CachedSubscription* cSubP, bool sysAttrs, b
     nodeP = kjString(orionldState.kjsonP, "modifiedAt", dateTime);
     NULL_CHECK(nodeP);
     kjChildAdd(sP, nodeP);
+  }
+
+  //
+  // Subordinate subscriptions
+  //
+  if ((distSubsEnabled == true) && (cSubP->subordinateP != NULL))
+  {
+    SubordinateSubscription* subordinateP = cSubP->subordinateP;
+    KjNode*                  subSubArray  = kjArray(orionldState.kjsonP, "subordinate");
+
+    while (subordinateP != NULL)
+    {
+      KjNode* subSub         = kjObject(orionldState.kjsonP, NULL);
+      KjNode* remoteSubId    = kjString(orionldState.kjsonP, "registrationId", subordinateP->registrationId);
+      KjNode* registrationId = kjString(orionldState.kjsonP, "subscriptionId", subordinateP->subscriptionId);
+
+      kjChildAdd(subSub, remoteSubId);
+      kjChildAdd(subSub, registrationId);
+      kjChildAdd(subSubArray, subSub);
+
+      subordinateP = subordinateP->next;
+    }
+
+    kjChildAdd(sP, subSubArray);
   }
 
   //
