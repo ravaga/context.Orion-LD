@@ -685,7 +685,7 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
     }
 
     time_t now = time(NULL);
-    if (now > startTime + 2)
+    if (now > startTime + 4)
     {
       timeout = true;
       break;
