@@ -150,6 +150,7 @@ bool notificationResponseRead
   // Initial read
   //
   bytesRead = readWithTimeout(npP->fd, buf, bufLen - 1, 0, 100000);
+
   if (bytesRead <= 0)
   {
     notificationFailure(npP->subP, "Unable to read from notification endpoint", notificationTime);
@@ -681,12 +682,13 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
 
         npP = npP->next;
       }
+    }
 
-      if (time(NULL) > startTime + 4)
-      {
-        timeout = true;
-        break;
-      }
+    time_t now = time(NULL);
+    if (now > startTime + 4)
+    {
+      timeout = true;
+      break;
     }
   }
 
@@ -703,6 +705,7 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
       {
         notificationFailure(npP->subP, "Timeout awaiting response from notification endpoint", notificationTime);
 
+        LM_T(LmtNotificationSend, ("Closing fd %d after timeout", npP->fd));
         close(npP->fd);
 
         npP->fd   = -1;

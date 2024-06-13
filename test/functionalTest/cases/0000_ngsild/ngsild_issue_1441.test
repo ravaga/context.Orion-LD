@@ -1,0 +1,276 @@
+# Copyright 2024 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscription Creation and a simple notification
+
+--SHELL-INIT--
+# Copied from ngsild_first_notification.test
+dbInit CB
+orionldStart CB -mongocOnly
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT} -url /noresponse
+
+--SHELL--
+
+#
+# 01. Ask broker for 'ngsi-ld version' - to see the open FDs
+# 02. Create an Entity urn:E1
+# 03. Create a subscription with the accumulator receiving notifications that are not responded - check for fd leak
+# 04. Provoke 100 notifications to the non-responding endpoint
+# 05. Ask broker for 'ngsi-ld version' - to see the open FDs
+# 06. Compare the two open FD numbers and make sure they're very similar
+# 07. GET the subscription, see it has errors and has been deactivated
+#
+
+echo "01. Ask broker for 'ngsi-ld version' - to see the open FDs"
+echo "=========================================================="
+orionCurl --url /ngsi-ld/ex/v1/version
+typeset -i fd1
+fd1=$(grep "Next File Descriptor" /tmp/orionCurl.response | awk -F: '{ print $2 }')
+echo
+echo
+
+
+echo "02. Create an Entity urn:E1"
+echo "==========================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": {
+    "type": "Property",
+    "value": 1
+  },
+  "P2": {
+    "type": "Property",
+    "value": "ok"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "03. Create a subscription with the accumulator receiving notifications that are not responded - check for fd leak"
+echo "================================================================================================================="
+payload='{
+  "id": "urn:S1",
+  "type": "Subscription",
+  "entities": [
+    {
+      "id": "urn:E1",
+      "type": "T"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/noresponse"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "04. Provoke 100 notifications to the non-responding endpoint"
+echo "============================================================"
+typeset -i val
+val=1
+while [ $val -le 100 ]
+do
+  payload='{
+    "P3": {
+      "type": "Property",
+      "value": '$val'
+    }
+  }'
+  orionCurl --url '/ngsi-ld/v1/entities/urn:E1' -X PATCH --payload "$payload"
+  val=$val+1
+done | grep 204 | wc -l
+
+echo
+echo
+
+
+echo "05. Ask broker for 'ngsi-ld version' - to see the open FDs"
+echo "=========================================================="
+orionCurl --url /ngsi-ld/ex/v1/version
+typeset -i fd2
+fd2=$(grep "Next File Descriptor" /tmp/orionCurl.response | awk -F: '{ print $2 }')
+echo
+echo
+
+
+echo "06. Compare the two open FD numbers and make sure they're very similar"
+echo "======================================================================"
+typeset -i diff
+diff=$(echo $fd2 - $fd1 | bc)
+if [ $diff -gt 6 ]
+then
+  echo "Too big difference between FDs in step 1 and 5: $fd1 vs $fd2 - possible FD leak"
+else
+  echo "All OK - no fd leak"
+fi
+echo
+echo
+
+
+echo "07. GET the subscription, see it has errors and has been deactivated"
+echo "===================================================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:S1
+echo
+echo
+
+
+--REGEXPECT--
+01. Ask broker for 'ngsi-ld version' - to see the open FDs
+==========================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "Core Context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)",
+    "Next File Descriptor": REGEX(.*),
+    "Orion-LD version": "REGEX(.*)",
+    "based on orion": "REGEX(.*)",
+    "boost version": "REGEX(.*)",
+    "branch": "REGEX(.*)",
+    "bson version": "REGEX(.*)",
+    "cached subscriptions": 0,
+    "kalloc version": "REGEX(.*)",
+    "kbase version": "REGEX(.*)",
+    "khash version": "REGEX(.*)",
+    "kjson version": "REGEX(.*)",
+    "libcurl version": "REGEX(.*)",
+    "libuuid version": "REGEX(.*)",
+    "microhttpd version": "REGEX(.*)",
+    "mongoc version": "REGEX(.*)",
+    "mongocpp version": "REGEX(.*)",
+    "mongodb server version": "REGEX(.*)",
+    "openssl version": "REGEX(.*)",
+    "rapidjson version": "REGEX(.*)"
+}
+
+
+02. Create an Entity urn:E1
+===========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+03. Create a subscription with the accumulator receiving notifications that are not responded - check for fd leak
+=================================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:S1
+
+
+
+04. Provoke 100 notifications to the non-responding endpoint
+============================================================
+100
+
+
+05. Ask broker for 'ngsi-ld version' - to see the open FDs
+==========================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "Core Context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)",
+    "Next File Descriptor": REGEX(.*),
+    "Orion-LD version": "REGEX(.*)",
+    "based on orion": "REGEX(.*)",
+    "boost version": "REGEX(.*)",
+    "branch": "REGEX(.*)",
+    "bson version": "REGEX(.*)",
+    "cached subscriptions": 1,
+    "kalloc version": "REGEX(.*)",
+    "kbase version": "REGEX(.*)",
+    "khash version": "REGEX(.*)",
+    "kjson version": "REGEX(.*)",
+    "libcurl version": "REGEX(.*)",
+    "libuuid version": "REGEX(.*)",
+    "microhttpd version": "REGEX(.*)",
+    "mongoc version": "REGEX(.*)",
+    "mongocpp version": "REGEX(.*)",
+    "mongodb server version": "REGEX(.*)",
+    "openssl version": "REGEX(.*)",
+    "rapidjson version": "REGEX(.*)"
+}
+
+
+06. Compare the two open FD numbers and make sure they're very similar
+======================================================================
+All OK - no fd leak
+
+
+07. GET the subscription, see it has errors and has been deactivated
+====================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+{
+    "entities": [
+        {
+            "id": "urn:E1",
+            "type": "T"
+        }
+    ],
+    "id": "urn:S1",
+    "isActive": false,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)",
+    "notification": {
+        "consecutiveErrors": REGEX(.*),
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "http://REGEX(.*)/noresponse"
+        },
+        "format": "normalized",
+        "lastErrorReason": "Timeout awaiting response from notification endpoint",
+        "lastFailure": "202REGEX(.*)Z",
+        "lastNotification": "202REGEX(.*)Z",
+        "status": "failed",
+        "timesFailed": REGEX(.*),
+        "timesSent": REGEX(.*)
+    },
+    "origin": "cache",
+    "status": "paused",
+    "type": "Subscription"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB
