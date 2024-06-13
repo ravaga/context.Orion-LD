@@ -12,6 +12,7 @@
   * Fixed a possible crash for TRoE and attributes of type Vocab/Json/Language
   * Forbidden to DELETE the Core Context !!!  (it can be reloaded)
   * Bug fix: JSON NULL literal is no longer forwarded!
+  * Improved treatment of malfunctioning notification receivers, on timeout (for clients that don't respond to the notification)
 
 ## New Features:
   * Support for attributes of type VocabularyProperty
