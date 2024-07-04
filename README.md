@@ -66,9 +66,9 @@ The latest specification is [version 1.8.1](https://www.etsi.org/deliver/etsi_gs
 and it was published in March 2024. The next release, v1.9.1, is expected for November-December 2024
 
 A few presentations on NGSI-LD:
-* [NGSI-LD Overview]{https://docs.google.com/presentation/d/1tgh6gBdcZHRPU_ehM7M5rGCI83CrYimCwJXxzRI5GDg}
-* [NGSI-LD in 30 min]{https://docs.google.com/presentation/d/1z1IzikB7NxIkihDosV4KrtNS_IJUdrNiwC_b4wAI0rc/edit#slide=id.p1}
-* [NGSI-LD in a nutshell]{https://docs.google.com/presentation/d/14aoHGYzmfn_a31ByG_Tf8pejuP6oWhjqhraLsPtRp_k/edit#slide=id.p1}
+* [NGSI-LD Overview](https://docs.google.com/presentation/d/1tgh6gBdcZHRPU_ehM7M5rGCI83CrYimCwJXxzRI5GDg)
+* [NGSI-LD in 30 min](https://docs.google.com/presentation/d/1z1IzikB7NxIkihDosV4KrtNS_IJUdrNiwC_b4wAI0rc/edit#slide=id.p1)
+* [NGSI-LD in a nutshell](https://docs.google.com/presentation/d/14aoHGYzmfn_a31ByG_Tf8pejuP6oWhjqhraLsPtRp_k/edit#slide=id.p1)
 
 Examples of **NGSI-LD** payloads can be found in [ETSI](https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/tree/master/examples).
 See also the [OpenAPI Specification of NGSI-LD](https://forge.etsi.org/swagger/ui/?url=https://forge.etsi.org/rep/cim/ngsi-ld-openapi/-/raw/1.7.1/ngsi-ld-api.yaml)
