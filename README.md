@@ -95,7 +95,7 @@ If you (at your own risk) want to evaluate the bleeding edge development changes
 `docker run fiware/orion-ld:latest` or even better: use
 [docker compose](https://github.com/FIWARE/context.Orion-LD/blob/develop/docker/docker-compose.yml) to run it.
 
-The use of the "latest" tag is **NOT RECOMMENDED**, as it keeps changing. Please don't use it. It's solely meant for internal fortesting.
+The use of the "latest" tag is NOT RECOMMENDED, as it keeps changing. Please don't use it. It's solely meant for internal fortesting.
 Thge recommendation is to use the newest fixed tag you find and stick to it until you have need for some newer feature/fix and then change to that newer fixed tag.
 Every merged pull request results in a new fixed tag in dockerhub.
 
