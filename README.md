@@ -63,7 +63,7 @@ Its payloads are encoded as [linked data](https://en.wikipedia.org/wiki/Linked_d
 
 The NGSI-LD Specification is regularly updated and published by ETSI.
 The latest specification is [version 1.8.1](https://www.etsi.org/deliver/etsi_gs/CIM/001_099/009/01.08.01_60/gs_cim009v010801p.pdf)
-and it was published in March 2024. The next release, v1.9.1, is expected for November 2024
+and it was published in March 2024. The next release, v1.9.1, is expected for November-December 2024
 
 A few presentations on NGSI-LD:
 * [NGSI-LD Overview]{https://docs.google.com/presentation/d/1tgh6gBdcZHRPU_ehM7M5rGCI83CrYimCwJXxzRI5GDg}
@@ -95,7 +95,7 @@ If you (at your own risk) want to evaluate the bleeding edge development changes
 `docker run fiware/orion-ld:latest` or even better: use
 [docker compose](https://github.com/FIWARE/context.Orion-LD/blob/develop/docker/docker-compose.yml) to run it.
 
-The use of the "latest" tag is NOT RECOMMENDED, as it keeps changing. Please don't use it. It's solely meant for internal fortesting.
+The use of the "latest" tag is NOT RECOMMENDED, as it keeps changing. Please don't use it. It's solely meant for internal testing.
 Thge recommendation is to use the newest fixed tag you find and stick to it until you have need for some newer feature/fix and then change to that newer fixed tag.
 Every merged pull request results in a new fixed tag in dockerhub.
 
@@ -123,9 +123,9 @@ Please check [quay.io](https://quay.io/repository/fiware/orion-ld?tab=tags) for 
 -   [Planning - Issue #280](https://github.com/FIWARE/context.Orion-LD/issues/280)
 
 A Test Suite for NGSI-LD compliant brokers can be found [here](https://github.com/fiware/NGSI-LD_Tests).
-This test suite is deprecated in favor of the [ETSI NGSI-LD API Conformance Test Suite](https://forge.etsi.org/rep/cim/ngsi-ld-test-suite).
+This test suite is deprecated in favor of the newer [ETSI NGSI-LD API Conformance Test Suite](https://forge.etsi.org/rep/cim/ngsi-ld-test-suite).
 (Orion-LD passes about 95% of the test cases of this older deprecated test suite.)
 
 About the ETSI funded conformance test suite, a third TTF (Testing Task force) is currently in progress, to aggregate conformance tests for distributed operations.
-The work is expected to finish in February 2025 and by then we expect the ETSI NGSI-LD conformance test suite to be fully operational, the results for Orion-LD
-will be published.
+The TTF is expected to finish in February 2025 and by then we expect the ETSI NGSI-LD conformance test suite to be fully operational, and thus test results for Orion-LD
+can and will be published.
