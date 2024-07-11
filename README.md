@@ -15,7 +15,7 @@ This project is part of [FIWARE](https://www.fiware.org/). For more information 
 [FIWARE Core Context Management](https://github.com/Fiware/catalogue/tree/master/core).
 
 Issues on this projects can be reported as [github issues](https://github.com/FIWARE/context.Orion-LD/issues),
-while questions are preferred on Stackoverflow, using the tag `fiware-orion`.
+while questions are preferred on [Stack Overflow](http://stackoverflow.com/questions/tagged/fiware-orion), using the tag `fiware-orion`.
 
 > The latest release of Orion-LD is [1.5.1](https://github.com/FIWARE/context.Orion-LD/releases/tag/1.5.1) from January 2024
 
@@ -68,10 +68,10 @@ The next release, version 1.9.1, is expected for September/October 2024·
 A few presentations on NGSI-LD:
 * [NGSI-LD Overview](https://docs.google.com/presentation/d/1tgh6gBdcZHRPU_ehM7M5rGCI83CrYimCwJXxzRI5GDg)
 * [NGSI-LD in 30 min](https://docs.google.com/presentation/d/1z1IzikB7NxIkihDosV4KrtNS_IJUdrNiwC_b4wAI0rc)
-* [NGSI-LD in a nutshell](https://docs.google.com/presentation/d/14aoHGYzmfn_a31ByG_Tf8pejuP6oWhjqhraLsPtRp_k)
+* [NGSI-LD in a Nutshell](https://docs.google.com/presentation/d/14aoHGYzmfn_a31ByG_Tf8pejuP6oWhjqhraLsPtRp_k)
 
 Examples of **NGSI-LD** payloads can be found in [ETSI](https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/tree/master/examples).
-See also the [OpenAPI Specification of NGSI-LD](https://forge.etsi.org/swagger/ui/?url=https://forge.etsi.org/rep/cim/ngsi-ld-openapi/-/raw/1.7.1/ngsi-ld-api.yaml)
+See also the [OpenAPI Specification of NGSI-LD](https://forge.etsi.org/swagger/ui/?url=https://forge.etsi.org/rep/cim/ngsi-ld-openapi/-/raw/1.7.1/ngsi-ld-api.yaml).  
 That is for version 1.7.1 of the NGSI-LD API specification.  
 We're currently working on updating this to v1.8.1, ETA: Dec 2024.
 
@@ -108,19 +108,17 @@ If you want to use a more stable image, the latest release (as of January 2024) 
 docker run quay.io/fiware/orion-ld:1.5.1
 ```
 
-Please check [quay.io](https://quay.io/repository/fiware/orion-ld?tab=tags) for other releases.
+Please check [quay.io](https://quay.io/repository/fiware/orion-ld?tab=tags) or [dockerhub](https://hub.docker.com/r/fiware/orion-ld/tags) for other releases.
 
 ## Documentation:
 -   [Guide to NGSI-LD entities and attributes](doc/manuals-ld/entities-and-attributes.md)
--   [Guide to the context](doc/manuals-ld/the-context.md)
+-   [Guide to the JSON-LD @context](doc/manuals-ld/the-context.md)
 -   [Installation Guide](doc/manuals-ld/installation-guide.md)
 -   [Quick Start Guide](doc/manuals-ld/quick-start-guide.md)
 -   [External Libraries](doc/manuals-ld/external-libraries.md)
 -   [Temporal Representation](doc/manuals-ld/troe.md)
 -   [The Broker as Context Server](doc/manuals-ld/contextServer.md)
--   [State of the Implementation](doc/manuals-ld/implementationState.md)
 -   [Roadmap](doc/roadmap.md)
--   [Planning - Issue #280](https://github.com/FIWARE/context.Orion-LD/issues/280)
 
 A Test Suite for NGSI-LD compliant brokers can be found [here](https://github.com/fiware/NGSI-LD_Tests).
 This test suite is deprecated in favor of the newer [ETSI NGSI-LD API Conformance Test Suite](https://forge.etsi.org/rep/cim/ngsi-ld-test-suite).
