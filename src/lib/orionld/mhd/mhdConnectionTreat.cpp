@@ -607,7 +607,6 @@ static void contextToPayload(void)
     if (orionldState.out.contentType == MT_JSONLD)
       coreContextToResponse(orionldState.responseTree);
   }
-
 }
 
 
