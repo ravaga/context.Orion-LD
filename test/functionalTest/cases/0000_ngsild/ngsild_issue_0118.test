@@ -342,13 +342,16 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
 04. GET subscriptions, Accept MIME type explicitly set to application/ld+json, make sure application/ld+json is returned
 ========================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 810
+Content-Length: 879
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 [
     {
-        "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+        "@context": [
+            "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+            "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+        ],
         "description": "Description of Test subscription 01",
         "entities": [
             {
@@ -524,12 +527,15 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
 07. GET particular subscription, Accept MIME type explicitly set to application/ld+json, make sure application/ld+json is returned
 ==================================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 808
+Content-Length: 877
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "@context": [
+        "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+        "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+    ],
     "description": "Description of Test subscription 01",
     "entities": [
         {

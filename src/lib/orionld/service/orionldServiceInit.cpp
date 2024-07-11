@@ -221,6 +221,8 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   }
   else if (serviceP->serviceRoutine == orionldGetEntities)
   {
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_CORE_CONTEXT_IN_RESPONSE;
+
     serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
     serviceP->uriParams |= ORIONLD_URIPARAM_FORMAT;
     serviceP->uriParams |= ORIONLD_URIPARAM_LIMIT;
@@ -245,6 +247,8 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   }
   else if (serviceP->serviceRoutine == orionldGetEntity)
   {
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_CORE_CONTEXT_IN_RESPONSE;
+
     serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
     serviceP->uriParams |= ORIONLD_URIPARAM_FORMAT;
     serviceP->uriParams |= ORIONLD_URIPARAM_ATTRS;
@@ -328,6 +332,8 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   }
   else if (serviceP->serviceRoutine == orionldGetRegistrations)
   {
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_CORE_CONTEXT_IN_RESPONSE;
+
     serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
     serviceP->uriParams |= ORIONLD_URIPARAM_LIMIT;
     serviceP->uriParams |= ORIONLD_URIPARAM_OFFSET;
@@ -349,6 +355,8 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   }
   else if (serviceP->serviceRoutine == orionldGetRegistration)
   {
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_CORE_CONTEXT_IN_RESPONSE;
+
     serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
   }
   else if (serviceP->serviceRoutine == orionldPatchRegistration)
@@ -368,7 +376,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   }
   else if (serviceP->serviceRoutine == orionldGetSubscriptions)
   {
-    serviceP->options   |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_CORE_CONTEXT_IN_RESPONSE;
 
     serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
     serviceP->uriParams |= ORIONLD_URIPARAM_COUNT;
@@ -377,7 +385,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   }
   else if (serviceP->serviceRoutine == orionldGetSubscription)
   {
-    serviceP->options   |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_CORE_CONTEXT_IN_RESPONSE;
 
     serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
   }
@@ -423,6 +431,8 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   else if (serviceP->serviceRoutine == orionldPostQuery)
   {
     serviceP->isBatchOp  = true;
+
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_CORE_CONTEXT_IN_RESPONSE;
 
     serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
     serviceP->uriParams |= ORIONLD_URIPARAM_COUNT;

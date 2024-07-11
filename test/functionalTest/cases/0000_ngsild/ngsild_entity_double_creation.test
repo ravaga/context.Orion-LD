@@ -95,12 +95,15 @@ Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
 02. GET /ngsi-ld/v1/entities/E1
 ===============================
 HTTP/1.1 200 OK
-Content-Length: 171
+Content-Length: 240
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "@context": [
+        "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+        "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+    ],
     "id": "http://a.b.c/entity/E1",
     "name": {
         "type": "Property",
@@ -127,12 +130,15 @@ Date: REGEX(.*)
 04. GET /ngsi-ld/v1/entities/E1, making sure step 02 didn't modify anything
 ===========================================================================
 HTTP/1.1 200 OK
-Content-Length: 171
+Content-Length: 240
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "@context": [
+        "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+        "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+    ],
     "id": "http://a.b.c/entity/E1",
     "name": {
         "type": "Property",

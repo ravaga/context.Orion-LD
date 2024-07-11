@@ -174,13 +174,16 @@ Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E5
 06. GET all entities that has an attribute A == 1 to 3 - see E1 and E3
 ======================================================================
 HTTP/1.1 200 OK
-Content-Length: 429
+Content-Length: 605
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 [
   {
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "@context": [
+      "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+    ],
     "id": "http://a.b.c/entity/E1",
     "type": "T",
     "A": {
@@ -189,7 +192,10 @@ Date: REGEX(.*)
     }
   },
   {
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "@context": [
+      "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+    ],
     "id": "http://a.b.c/entity/E3",
     "type": "T",
     "A": {

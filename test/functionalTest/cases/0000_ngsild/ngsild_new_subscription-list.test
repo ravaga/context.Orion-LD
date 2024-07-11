@@ -2640,14 +2640,17 @@ NGSILD-Results-Count: 40
 09. GET subscriptions from tenant t1, with offset 36 AND with Accept: application/ld+json - see 4 subs
 ======================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 3365
+Content-Length: 3641
 Content-Type: application/ld+json
 Date: REGEX(.*)
 NGSILD-Results-Count: 40
 
 [
     {
-        "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+        "@context": [
+            "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+            "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+        ],
         "description": "Description of Test subscription 0037",
         "entities": [
             {
@@ -2699,7 +2702,10 @@ NGSILD-Results-Count: 40
         ]
     },
     {
-        "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+        "@context": [
+            "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+            "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+        ],
         "description": "Description of Test subscription 0038",
         "entities": [
             {
@@ -2751,7 +2757,10 @@ NGSILD-Results-Count: 40
         ]
     },
     {
-        "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+        "@context": [
+            "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+            "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+        ],
         "description": "Description of Test subscription 0039",
         "entities": [
             {
@@ -2803,7 +2812,10 @@ NGSILD-Results-Count: 40
         ]
     },
     {
-        "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+        "@context": [
+            "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+            "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+        ],
         "description": "Description of Test subscription 0040",
         "entities": [
             {
@@ -4720,14 +4732,17 @@ NGSILD-Results-Count: 40
 16. GET subscriptions from DB - from tenant t1, with offset 36 AND with Accept: application/ld+json - see 4 subs
 ================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 3377
+Content-Length: 3653
 Content-Type: application/ld+json
 Date: REGEX(.*)
 NGSILD-Results-Count: 40
 
 [
     {
-        "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+        "@context": [
+            "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+            "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+        ],
         "description": "Description of Test subscription 0037",
         "entities": [
             {
@@ -4779,7 +4794,10 @@ NGSILD-Results-Count: 40
         ]
     },
     {
-        "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+        "@context": [
+            "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+            "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+        ],
         "description": "Description of Test subscription 0038",
         "entities": [
             {
@@ -4831,7 +4849,10 @@ NGSILD-Results-Count: 40
         ]
     },
     {
-        "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+        "@context": [
+            "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+            "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+        ],
         "description": "Description of Test subscription 0039",
         "entities": [
             {
@@ -4883,7 +4904,10 @@ NGSILD-Results-Count: 40
         ]
     },
     {
-        "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+        "@context": [
+            "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+            "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+        ],
         "description": "Description of Test subscription 0040",
         "entities": [
             {

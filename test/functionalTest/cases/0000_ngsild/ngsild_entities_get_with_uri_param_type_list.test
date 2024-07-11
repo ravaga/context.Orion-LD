@@ -171,13 +171,16 @@ Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E4
 05. GET entities with type T - see E1
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 220
+Content-Length: 308
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 [
   {
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "@context": [
+      "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+    ],
     "id": "http://a.b.c/entity/E1",
     "type": "T",
     "A1": {
@@ -192,13 +195,16 @@ Date: REGEX(.*)
 06. GET entities with type T2 or T3 or T4 - see E2, E3 and E4
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 657
+Content-Length: 921
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 [
   {
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "@context": [
+      "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+    ],
     "id": "http://a.b.c/entity/E2",
     "type": "T2",
     "A1": {
@@ -207,7 +213,10 @@ Date: REGEX(.*)
     }
   },
   {
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "@context": [
+      "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+    ],
     "id": "http://a.b.c/entity/E3",
     "type": "T3",
     "A1": {
@@ -216,7 +225,10 @@ Date: REGEX(.*)
     }
   },
   {
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "@context": [
+      "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+    ],
     "id": "http://a.b.c/entity/E4",
     "type": "T4",
     "A1": {
@@ -231,13 +243,16 @@ Date: REGEX(.*)
 07. GET entities with type T2 or T1 - see E2
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 221
+Content-Length: 309
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 [
   {
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "@context": [
+      "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+    ],
     "id": "http://a.b.c/entity/E2",
     "type": "T2",
     "A1": {

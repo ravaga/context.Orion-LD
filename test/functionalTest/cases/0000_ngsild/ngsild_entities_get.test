@@ -236,13 +236,16 @@ Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E4
 05. GET all entities of type T, see E1 and E3
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 617
+Content-Length: 793
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 [
   {
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "@context": [
+      "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+    ],
     "id": "http://a.b.c/entity/E1",
     "type": "T",
     "P1": {
@@ -255,7 +258,10 @@ Date: REGEX(.*)
     }
   },
   {
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "@context": [
+      "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+    ],
     "id": "http://a.b.c/entity/E3",
     "type": "T",
     "P1": {
@@ -274,13 +280,16 @@ Date: REGEX(.*)
 06. GET all entities of type T2, see E2 and E4
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 619
+Content-Length: 795
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 [
   {
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "@context": [
+      "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+    ],
     "id": "http://a.b.c/entity/E2",
     "type": "T2",
     "P1": {
@@ -293,7 +302,10 @@ Date: REGEX(.*)
     }
   },
   {
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "@context": [
+      "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+    ],
     "id": "http://a.b.c/entity/E4",
     "type": "T2",
     "P1": {
@@ -312,13 +324,16 @@ Date: REGEX(.*)
 07. GET all entities with id E1, see entity E1 only
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 310
+Content-Length: 398
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 [
   {
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "@context": [
+      "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+    ],
     "id": "http://a.b.c/entity/E1",
     "type": "T",
     "P1": {
@@ -337,14 +352,17 @@ Date: REGEX(.*)
 08. GET all entities with id E.*, see all four entities
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 1233
+Content-Length: 1585
 Content-Type: application/ld+json
 Date: REGEX(.*)
 NGSILD-Results-Count: 4
 
 [
   {
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "@context": [
+      "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+    ],
     "id": "http://a.b.c/entity/E1",
     "type": "T",
     "P1": {
@@ -357,7 +375,10 @@ NGSILD-Results-Count: 4
     }
   },
   {
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "@context": [
+      "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+    ],
     "id": "http://a.b.c/entity/E2",
     "type": "T2",
     "P1": {
@@ -370,7 +391,10 @@ NGSILD-Results-Count: 4
     }
   },
   {
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "@context": [
+      "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+    ],
     "id": "http://a.b.c/entity/E3",
     "type": "T",
     "P1": {
@@ -383,7 +407,10 @@ NGSILD-Results-Count: 4
     }
   },
   {
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "@context": [
+      "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+    ],
     "id": "http://a.b.c/entity/E4",
     "type": "T2",
     "P1": {
@@ -425,13 +452,16 @@ NGSILD-Results-Count: 4
 11. GET all entities of type T with options=sysAttrs set, see E1 and E3, with createdAt/modifiedAt present
 ==========================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 1179
+Content-Length: 1355
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 [
   {
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "@context": [
+      "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+    ],
     "id": "http://a.b.c/entity/E1",
     "type": "T",
     "createdAt": "REGEX(.*)",
@@ -450,7 +480,10 @@ Date: REGEX(.*)
     }
   },
   {
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "@context": [
+      "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+    ],
     "id": "http://a.b.c/entity/E3",
     "type": "T",
     "createdAt": "REGEX(.*)",
@@ -475,13 +508,16 @@ Date: REGEX(.*)
 12. GET ALL LOCAL entities
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 1233
+Content-Length: 1585
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 [
   {
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "@context": [
+      "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+    ],
     "id": "http://a.b.c/entity/E1",
     "type": "T",
     "P1": {
@@ -494,7 +530,10 @@ Date: REGEX(.*)
     }
   },
   {
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "@context": [
+      "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+    ],
     "id": "http://a.b.c/entity/E2",
     "type": "T2",
     "P1": {
@@ -507,7 +546,10 @@ Date: REGEX(.*)
     }
   },
   {
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "@context": [
+      "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+    ],
     "id": "http://a.b.c/entity/E3",
     "type": "T",
     "P1": {
@@ -520,7 +562,10 @@ Date: REGEX(.*)
     }
   },
   {
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "@context": [
+      "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+    ],
     "id": "http://a.b.c/entity/E4",
     "type": "T2",
     "P1": {

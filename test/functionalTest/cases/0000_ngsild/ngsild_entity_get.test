@@ -128,12 +128,15 @@ Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E2
 03. GET E1, see default context, pretty-print with 4 spaces
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 222
+Content-Length: 314
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "@context": [
+        "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+        "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+    ],
     "id": "http://a.b.c/entity/E1",
     "type": "A",
     "name": {
@@ -147,12 +150,15 @@ Date: REGEX(.*)
 04. GET E2, see test context, pretty-print with default number of spaces (2)
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 204
+Content-Length: 286
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
-  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+  "@context": [
+    "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+  ],
   "id": "http://a.b.c/entity/E2",
   "type": "A",
   "name": {
@@ -166,11 +172,11 @@ Date: REGEX(.*)
 05. GET E2, but without prettyPrint
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 171
+Content-Length: 240
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
-{"@context":"https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld","id":"http://a.b.c/entity/E2","type":"A","name":{"type":"Property","value":"John 6"}}
+{"@context":["https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld","https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"],"id":"http://a.b.c/entity/E2","type":"A","name":{"type":"Property","value":"John 6"}}
 
 
 06. Attempt to GET non-existing E3, see 404 not Found

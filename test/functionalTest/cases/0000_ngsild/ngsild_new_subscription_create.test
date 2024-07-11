@@ -528,7 +528,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
 04. GET /ngsi-ld/v1/subscription/http://a.b.c/subs/sub01, accepting jsonld - see @context in payload
 ====================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 1356
+Content-Length: 1438
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -595,7 +595,10 @@ Date: REGEX(.*)
   "throttling": 5,
   "origin": "cache",
   "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
-  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+  "@context": [
+    "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+  ]
 }
 
 
