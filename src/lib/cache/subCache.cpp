@@ -665,6 +665,25 @@ void subCacheItemStrip(CachedSubscription* cSubP)
       cSubP->httpInfo.notifierInfo[ix] = NULL;
     }
   }
+
+  if (cSubP->subordinateP != NULL)
+  {
+    SubordinateSubscription* subordinateP = cSubP->subordinateP;
+
+    while (subordinateP->next != NULL)
+    {
+      SubordinateSubscription* next = subordinateP->next;
+
+      free(subordinateP->subscriptionId);
+      free(subordinateP);
+      subordinateP = next;
+    }
+
+    free(subordinateP->subscriptionId);
+    free(subordinateP);
+
+    cSubP->subordinateP = NULL;
+  }
 }
 
 
