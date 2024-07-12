@@ -148,13 +148,16 @@ Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E4
 05. GET all entities that does not have an attribute A - see E2 and E4
 ======================================================================
 HTTP/1.1 200 OK
-Content-Length: 440
+Content-Length: 616
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 [
   {
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "@context": [
+      "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+    ],
     "id": "http://a.b.c/entity/E2",
     "type": "T2",
     "A2": {
@@ -163,7 +166,10 @@ Date: REGEX(.*)
     }
   },
   {
-    "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "@context": [
+      "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+      "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+    ],
     "id": "http://a.b.c/entity/E4",
     "type": "T2",
     "A2": {

@@ -27,6 +27,7 @@
 
 extern "C"
 {
+#include "kbase/kMacros.h"                                         // K_FT
 #include "kbase/kTime.h"                                           // kTimeGet
 #include "kbase/kStringSplit.h"                                    // kStringSplit
 #include "kjson/KjNode.h"                                          // KjNode
@@ -460,6 +461,76 @@ static bool linkGet(const char* link)
 
 // -----------------------------------------------------------------------------
 //
+// coreContextToResponse -
+//
+static void coreContextToResponse(KjNode* responseP)
+{
+  if (responseP->type == KjObject)
+  {
+    KjNode* contextP = kjLookup(responseP, "@context");
+
+    if (contextP != NULL)
+    {
+      if (contextP->type == KjString)
+      {
+        //
+        // If the string is the core context, all OK
+        // If not, we have to creat an array of the user context and the core context
+        //
+        if (strcmp(contextP->value.s, coreContextUrl) != 0)
+        {
+          KjNode* userContext      = kjString(orionldState.kjsonP, NULL, contextP->value.s);
+          KjNode* coreContextNodeP = kjString(orionldState.kjsonP, NULL, coreContextUrl);
+
+          //
+          // Change contextP from String to Array
+          //
+          contextP->type              = KjArray;
+          contextP->value.firstChildP = NULL;
+          contextP->lastChild         = NULL;
+
+          kjChildAdd(contextP, userContext);
+          kjChildAdd(contextP, coreContextNodeP);
+        }
+      }
+      else if (contextP->type == KjObject)
+      {
+        KjNode* contextArray     = kjArray(orionldState.kjsonP, "@context");
+        KjNode* coreContextNodeP = kjString(orionldState.kjsonP, NULL, coreContextUrl);
+
+        kjChildRemove(responseP, contextP);
+        kjChildAdd(contextArray, contextP);
+        kjChildAdd(contextArray, coreContextNodeP);
+        kjChildAdd(responseP, contextArray);
+      }
+      else if (contextP->type == KjArray)
+      {
+        // Last item must be the core context
+        KjNode* lastP = contextP->value.firstChildP;
+        while (lastP->next != NULL)
+          lastP = lastP->next;
+
+        if (strcmp(lastP->value.s, coreContextUrl) != 0)
+        {
+          KjNode* coreContextNodeP = kjString(orionldState.kjsonP, NULL, coreContextUrl);
+          kjChildAdd(contextP, coreContextNodeP);
+        }
+      }
+    }
+  }
+  else if (responseP->type == KjArray)
+  {
+    for (KjNode* entityP = responseP->value.firstChildP; entityP != NULL; entityP = entityP->next)
+    {
+      coreContextToResponse(entityP);
+    }
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // contextToPayload -
 //
 static void contextToPayload(void)
@@ -526,6 +597,15 @@ static void contextToPayload(void)
   else
   {
     // Any other type ??? Error
+  }
+
+  //
+  // Add the core context to the response?
+  //
+  if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_CORE_CONTEXT_IN_RESPONSE) != 0)
+  {
+    if (orionldState.out.contentType == MT_JSONLD)
+      coreContextToResponse(orionldState.responseTree);
   }
 }
 

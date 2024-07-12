@@ -13,13 +13,14 @@
   * Forbidden to DELETE the Core Context !!!  (it can be reloaded)
   * Bug fix: JSON NULL literal is no longer forwarded!
   * Improved treatment of malfunctioning notification receivers, on timeout (for clients that don't respond to the notification)
+  * Core context added to response if @context in payload body (Accept: application/ld+json)
 
 ## New Features:
   * Support for attributes of type VocabularyProperty
   * Support for attributes of type JsonProperty
   * Support for the new URL parameter "format" for output formats (normalized, concise, simplified)
-  * New service: DELETE /ngsi-ld/v1/entities  (URL param 'type' only - the rest are missing still)
-  * Distributed Subscriptions  
+  * New service: DELETE /ngsi-ld/v1/entities  (URL param 'type' only - the rest of the options are still missing)
+  * First draft of Distributed Subscriptions
 
 ## Notes
   * TRoE is still not prepared for attributes of type Vocab/Json/Language, so, attributes of those types are not stored in the historical database

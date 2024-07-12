@@ -91,12 +91,15 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:00:00:00
 02. GET entity, accepting application/ld+json, and with same context as the entity creation
 ===========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 643
+Content-Length: 725
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
-  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
+  "@context": [
+    "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+  ],
   "id": "urn:ngsi-ld:T:00:00:00",
   "type": "T",
   "P1": {

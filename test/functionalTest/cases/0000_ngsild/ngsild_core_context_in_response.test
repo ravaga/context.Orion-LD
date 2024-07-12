@@ -1,0 +1,205 @@
+# Copyright 2024 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Core context in response of entity query and retrieval
+
+--SHELL-INIT--
+dbInit CB
+orionldStart CB -experimental
+
+--SHELL--
+
+#
+# 01. Create entity urn:E1, with @context http://smartdatamodels.org/context.jsonld
+# 02. Create entity urn:E1, with @context http://smartdatamodels.org/context.jsonld
+# 03. Retrieve urn:E1, with @context http://smartdatamodels.org/context.jsonld and Accept ld+json - see core context in response
+# 04. Query entities, with @context http://smartdatamodels.org/context.jsonld and Accept ld+json - see core context in response
+# 05. POST Query entities, with @context http://smartdatamodels.org/context.jsonld and Accept ld+json - see core context in response
+#
+
+echo "01. Create entity urn:E1, with @context http://smartdatamodels.org/context.jsonld"
+echo "================================================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "ByInvoice",
+  "Cash": 100 
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Link: <http://smartdatamodels.org/context.jsonld>"
+echo
+echo
+
+
+echo "02. Create entity urn:E1, with @context http://smartdatamodels.org/context.jsonld"
+echo "================================================================================="
+payload='{
+  "id": "urn:E2",
+  "type": "ByInvoice",
+  "Cash": 100 
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Link: <http://smartdatamodels.org/context.jsonld>"
+echo
+echo
+
+
+echo "03. Retrieve urn:E1, with @context http://smartdatamodels.org/context.jsonld and Accept ld+json - see core context in response"
+echo "=============================================================================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 --out application/ld+json -H "Link: <http://smartdatamodels.org/context.jsonld>"
+echo
+echo
+
+
+echo "04. Query entities, with @context http://smartdatamodels.org/context.jsonld and Accept ld+json - see core context in response"
+echo "============================================================================================================================="
+orionCurl --url /ngsi-ld/v1/entities?type=ByInvoice --out application/ld+json -H "Link: <http://smartdatamodels.org/context.jsonld>"
+echo
+echo
+
+
+echo "05. POST Query entities, with @context http://smartdatamodels.org/context.jsonld and Accept ld+json - see core context in response"
+echo "=================================================================================================================================="
+payload='{
+  "type": "Query",
+  "entities": [
+    {
+      "type": "ByInvoice"
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/entityOperations/query --payload "$payload" --out application/ld+json -H "Link: <http://smartdatamodels.org/context.jsonld>"
+echo
+echo
+
+--REGEXPECT--
+01. Create entity urn:E1, with @context http://smartdatamodels.org/context.jsonld
+=================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+02. Create entity urn:E1, with @context http://smartdatamodels.org/context.jsonld
+=================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E2
+
+
+
+03. Retrieve urn:E1, with @context http://smartdatamodels.org/context.jsonld and Accept ld+json - see core context in response
+==============================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 197
+Content-Type: application/ld+json
+Date: REGEX(.*)
+
+{
+    "@context": [
+        "http://smartdatamodels.org/context.jsonld",
+        "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+    ],
+    "Cash": {
+        "type": "Property",
+        "value": 100
+    },
+    "id": "urn:E1",
+    "type": "ByInvoice"
+}
+
+
+04. Query entities, with @context http://smartdatamodels.org/context.jsonld and Accept ld+json - see core context in response
+=============================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 397
+Content-Type: application/ld+json
+Date: REGEX(.*)
+
+[
+    {
+        "@context": [
+            "http://smartdatamodels.org/context.jsonld",
+            "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+        ],
+        "Cash": {
+            "type": "Property",
+            "value": 100
+        },
+        "id": "urn:E1",
+        "type": "ByInvoice"
+    },
+    {
+        "@context": [
+            "http://smartdatamodels.org/context.jsonld",
+            "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+        ],
+        "Cash": {
+            "type": "Property",
+            "value": 100
+        },
+        "id": "urn:E2",
+        "type": "ByInvoice"
+    }
+]
+
+
+05. POST Query entities, with @context http://smartdatamodels.org/context.jsonld and Accept ld+json - see core context in response
+==================================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 397
+Content-Type: application/ld+json
+Date: REGEX(.*)
+
+[
+    {
+        "@context": [
+            "http://smartdatamodels.org/context.jsonld",
+            "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+        ],
+        "Cash": {
+            "type": "Property",
+            "value": 100
+        },
+        "id": "urn:E1",
+        "type": "ByInvoice"
+    },
+    {
+        "@context": [
+            "http://smartdatamodels.org/context.jsonld",
+            "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+        ],
+        "Cash": {
+            "type": "Property",
+            "value": 100
+        },
+        "id": "urn:E2",
+        "type": "ByInvoice"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+
