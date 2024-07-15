@@ -41,6 +41,9 @@ accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 # 06. GET the subscription, see the subordinate subscription
 # 07. See the subscription in mongo
 # 08. GET the subscription from DB, see the subordinate subscription
+# 09. DELETE subscription S1 on CB, which triggers a forwarded request to DELETE the subscription in CP1
+# 10. List subs in CB - see empty array
+# 11. List subs in CP1 - see empty array
 #
 
 echo "01. Create a registration R1 on CB, on entity type T, with endpoint CP1"
@@ -132,6 +135,27 @@ orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:S1?options=fr
 echo
 echo
 
+
+
+echo "09. DELETE subscription S1 on CB, which triggers a forwarded request to DELETE the subscription in CP1"
+echo "======================================================================================================"
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:S1 -X DELETE
+echo
+echo
+
+
+echo "10. List subs in CB - see empty array"
+echo "====================================="
+orionCurl --url /ngsi-ld/v1/subscriptions
+echo
+echo
+
+
+echo "11. List subs in CP1 - see empty array"
+echo "======================================"
+orionCurl --url /ngsi-ld/v1/subscriptions --port $CP1_PORT
+echo
+echo
 
 
 --REGEXPECT--
@@ -341,6 +365,35 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
     ],
     "type": "Subscription"
 }
+
+
+09. DELETE subscription S1 on CB, which triggers a forwarded request to DELETE the subscription in CP1
+======================================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+10. List subs in CB - see empty array
+=====================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+[]
+
+
+11. List subs in CP1 - see empty array
+======================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+[]
 
 
 --TEARDOWN--
