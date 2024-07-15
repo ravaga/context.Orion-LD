@@ -1,5 +1,6 @@
 ## Fixed Issues:
 
 ## New Features:
+  * Distributed subscriptions: subordinate subscriptions are DELETED when their "father" is deleted
 
 ## Notes

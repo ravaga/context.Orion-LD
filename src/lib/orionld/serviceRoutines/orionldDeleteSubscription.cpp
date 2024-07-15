@@ -28,13 +28,14 @@
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
+#include "orionld/http/httpRequest.h"                            // httpRequest
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_URI
 #include "orionld/mqtt/mqttDisconnect.h"                         // mqttDisconnect
 #include "orionld/mongoc/mongocSubscriptionLookup.h"             // mongocSubscriptionLookup
 #include "orionld/mongoc/mongocSubscriptionDelete.h"             // mongocSubscriptionDelete
 #include "orionld/legacyDriver/legacyDeleteSubscription.h"       // legacyDeleteSubscription
+#include "orionld/regCache/regCacheItemLookup.h"                 // regCacheItemLookup
 #include "orionld/serviceRoutines/orionldDeleteSubscription.h"   // Own Interface
-
 
 
 // ----------------------------------------------------------------------------
@@ -78,6 +79,35 @@ bool orionldDeleteSubscription(void)
       MqttInfo* mqttP = &cSubP->httpInfo.mqtt;
       mqttDisconnect(mqttP->host, mqttP->port, mqttP->username, mqttP->password, mqttP->version);
     }
+
+    // Any subordinate subscriptions?
+    for (SubordinateSubscription* subordinateP = cSubP->subordinateP; subordinateP != NULL; subordinateP = subordinateP->next)
+    {
+      char  url[256];
+      char  ip[128];
+      RegCacheItem* rciP = regCacheItemLookup(orionldState.tenantP->regCache, subordinateP->registrationId);
+
+      strncpy(ip, rciP->ipAndPort, sizeof(ip) - 1);
+      char* colon = strchr(ip, ':');
+      if (colon != NULL)
+        *colon = 0;
+
+      snprintf(url, sizeof(url) - 1, "http://%s/ngsi-ld/v1/subscriptions/%s", rciP->ipAndPort, subordinateP->subscriptionId);
+
+      KjNode*                responseTree = NULL;
+      OrionldProblemDetails  pd;
+      int                    r;
+
+      bzero(&pd, sizeof(pd));
+      r = httpRequest(ip, "DELETE", url, NULL, NULL, NULL, 5000, &responseTree, &pd);
+      LM_W(("r = %d", r));
+      if (r != 204)
+      {
+        LM_W(("Unable to DELETE subordinate subscription '%s': status code %d, %s: %s", subordinateP->subscriptionId, r, pd.title, pd.detail));
+        kjTreeLog(responseTree, "Error response payload body", LmtSR);
+      }
+    }
+
     subCacheItemRemove(cSubP);
   }
 

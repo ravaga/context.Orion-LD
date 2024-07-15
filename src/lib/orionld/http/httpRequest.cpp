@@ -105,6 +105,34 @@ static size_t writeCallback(void* contents, size_t size, size_t members, void* u
 
 // -----------------------------------------------------------------------------
 //
+// responseHeaderDebug -
+//
+static size_t responseHeaderRead(char* buffer, size_t size, size_t nitems, void* userdata)
+{
+  int* statusCodeP = (int*) userdata;
+
+  if (*statusCodeP < 200)  // Status code Not set
+  {
+    if (strncmp(buffer, "HTTP/", 5) == 0)
+    {
+      // extract status code
+      char* space = strchr(buffer, ' ');
+      if (space != 0)
+      {
+        ++space;
+        *statusCodeP = atoi(space);
+      }
+    }
+  }
+
+  LM_T(LmtDistOpResponseHeaders, ("Response Header: %s", buffer));
+  return nitems;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // httpRequest -
 //
 // RETURN VALUE
@@ -205,6 +233,7 @@ int httpRequest
   // Prepare the CURL handle
   //
   OrionldResponseBuffer rBuf;
+  int                   responseCode = -1;
 
   bzero(&rBuf, sizeof(rBuf));
 
@@ -215,6 +244,8 @@ int httpRequest
   curl_easy_setopt(cc.curl, CURLOPT_TIMEOUT_MS, tmo);                      // Timeout, in milliseconds
   curl_easy_setopt(cc.curl, CURLOPT_FAILONERROR, true);                    // Fail On Error - to detect 404 etc.
   curl_easy_setopt(cc.curl, CURLOPT_FOLLOWLOCATION, 1L);                   // Follow redirections
+  curl_easy_setopt(cc.curl, CURLOPT_HEADERFUNCTION, responseHeaderRead);  // Callback for headers
+  curl_easy_setopt(cc.curl, CURLOPT_HEADERDATA,     &responseCode);        // Callback data for headers
 
   if (body != NULL)
   {
@@ -250,6 +281,7 @@ int httpRequest
 
   LM_T(LmtDistOpRequest, ("Sending HTTP request: %s %s", verb, url));
   cCode = curl_easy_perform(cc.curl);
+  httpStatus = responseCode;
 
   //
   // Cleanup
@@ -266,8 +298,6 @@ int httpRequest
 
     LM_RE(-1, ("Internal Error (curl_easy_perform returned error code %d)", cCode));
   }
-  else
-    httpStatus = 201;  // FIXME: get it from the response instead!!!
 
   // The downloaded buffer is in rBuf.buf - let's parse it into a KjNode tree!
   *responseTree = kjParse(orionldState.kjsonP, rBuf.buf);
