@@ -1,27 +1,5 @@
 ## Fixed Issues:
-  * #1535:  Ignore Subscription::q when matching subscriptions for deletion of an entity
-  * #1542:  Array Reduction (arrays of one single element are "flattened" to that very element)
-  * #1551:  format=simplified for distribute GET /entities gave Normalized for entities from other brokers
-  * #1557:  Cannot count entities if geo query with $near - mongodb doesn't allow it
-  * #1573:  pagination not working when entities have the exact same creation date (sort also by entity id)
-  * #1583:  If a 'q' contains an ampersand, that ampersand needs to be forwarded as a semicolon
-  * #1593:  Modify the type of an entity in a Replace operation (only working in legacy mode)
-  * #1612:  Support for ISO8601 timezones expressed in +/- HH:mm in 'q' for entity query
-  * #1615:  Crash in HTTPS notifications with a notification endpoint with empty URL PATH
-  * SOF:    https://stackoverflow.com/questions/77911109/fiware-to-payload-too-large
-  * Fixed a possible crash for TRoE and attributes of type Vocab/Json/Language
-  * Forbidden to DELETE the Core Context !!!  (it can be reloaded)
-  * Bug fix: JSON NULL literal is no longer forwarded!
-  * Improved treatment of malfunctioning notification receivers, on timeout (for clients that don't respond to notifications)
-  * Core context added to response if @context in payload body (Accept: application/ld+json)
 
 ## New Features:
-  * Support for attributes of type VocabularyProperty
-  * Support for attributes of type JsonProperty
-  * Support for the new URL parameter "format" for output formats (normalized, concise, simplified)
-  * New service: DELETE /ngsi-ld/v1/entities  (support for URL param 'type' only - the rest of the options are still missing)
-  * First draft of Distributed Subscriptions
 
 ## Notes
-  * TRoE is still not prepared for attributes of type Vocab/Json/Language, so, attributes of those types are not stored in the historical database
-  * Improved the @context hosting feature to be according to API spec
